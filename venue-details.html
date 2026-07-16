@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VenueX - Venue Details</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Toast Notification -->
+    <div id="toast-notify" class="toast">Favorite updated!</div>
+
+    <!-- Venue Details Page -->
+    <div class="page page-no-nav">
+      
+      <!-- Banner Image and Overlays -->
+      <div class="detail-banner">
+        <button class="back-button-circle" id="back-btn" aria-label="Back">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        
+        <button class="favorite-button-circle" id="fav-btn" aria-label="Favorite">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </button>
+
+        <img class="detail-banner-img" id="venue-img" src="" alt="Venue Image">
+
+        <div class="detail-banner-rating">
+          <svg viewBox="0 0 24 24" width="14" height="14">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <span id="venue-rating">4.9</span>
+        </div>
+      </div>
+
+      <!-- Venue Title Card -->
+      <div class="detail-info-card">
+        <h1 class="detail-title" id="venue-title">Greenfield Sports Club</h1>
+        <div class="detail-address">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span id="venue-address">Koramangala, Bengaluru &bull; 2.3 km</span>
+        </div>
+        <div class="detail-price-box">
+          <span class="detail-price-value" id="venue-price">₹2905</span>
+          <span class="detail-price-label">per hour</span>
+        </div>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="step-indicator">
+        <div class="step-item active">
+          <div class="step-number">1</div>
+          Pick Date
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          Pick Time
+        </div>
+      </div>
+
+      <!-- Date Selector -->
+      <section class="date-section">
+        <h2 class="date-section-title">Select Date</h2>
+        <p class="date-section-subtitle" id="selected-date-text">Friday, July 17, 2026</p>
+        
+        <div class="date-scroll-container no-scrollbar" id="date-picker-scroll">
+          <!-- Dynamic dates inserted here -->
+        </div>
+      </section>
+
+      <!-- Time Selector -->
+      <section class="time-section">
+        <h2 class="time-section-title">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Choose Your Time
+        </h2>
+        
+        <div class="time-selector-container">
+          <!-- Start Time Card -->
+          <div class="time-box">
+            <span class="time-box-label">Start Time</span>
+            <div class="time-input-wrapper">
+              <span id="start-time-display">05:00 AM</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <input type="time" id="start-time-input" class="native-time-input" value="05:00">
+          </div>
+
+          <!-- Divider Arrow -->
+          <span class="time-arrow">&rsaquo;</span>
+
+          <!-- End Time Card -->
+          <div class="time-box">
+            <span class="time-box-label">End Time</span>
+            <div class="time-input-wrapper">
+              <span id="end-time-display">11:00 AM</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <input type="time" id="end-time-input" class="native-time-input" value="11:00">
+          </div>
+        </div>
+
+        <div class="duration-badge-wrapper">
+          <div class="duration-badge">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span id="duration-badge-text">6h session</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Booking Summary Container -->
+      <section class="summary-section">
+        <div class="summary-card">
+          <h3 class="summary-card-title">Booking Summary</h3>
+          
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Date</span>
+              <span class="summary-value" id="sum-date">Tmrw, Jul 17</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Duration</span>
+              <span class="summary-value" id="sum-duration">6h</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Start Time</span>
+              <span class="summary-value" id="sum-start">05:00 AM</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">End Time</span>
+              <span class="summary-value" id="sum-end">11:00 AM</span>
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-total-row">
+            <div class="summary-total-label-col">
+              <span class="summary-total-label">Estimated Total</span>
+              <span class="summary-total-sublabel" id="sum-subtotal">₹2905/hr &bull; 6h</span>
+            </div>
+            <div class="summary-total-price" id="sum-total-price">₹17430</div>
+          </div>
+        </div>
+      </section>
+
+      <div style="height: 100px;"></div> <!-- Spacer -->
+
+      <!-- Fixed CTA Bar -->
+      <div class="cta-bottom-bar">
+        <button class="primary-cta-btn" id="check-availability-btn">
+          Check Availability &rsaquo;
+        </button>
+        <div class="cta-bottom-bar-text">Free cancellation up to 2 hours before booking</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let venue = null;
+    let selectedDate = '';
+    let startTime = '05:00';
+    let endTime = '11:00';
+    let calculatedDuration = 6;
+    let totalPrice = 0;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Load Venue Details from Query Param
+      const params = new URLSearchParams(window.location.search);
+      const id = parseInt(params.get('id')) || 2; // Default to Greenfield Sports Club
+      venue = VENUES.find(v => v.id === id);
+
+      if (!venue) {
+        alert('Venue not found.');
+        window.location.href = 'home.html';
+        return;
+      }
+
+      // Populate venue UI elements
+      document.getElementById('venue-img').src = venue.image;
+      document.getElementById('venue-title').textContent = venue.name;
+      document.getElementById('venue-rating').textContent = venue.rating + ` (${venue.reviews})`;
+      document.getElementById('venue-address').innerHTML = `${venue.location} &bull; ${venue.distance}`;
+      document.getElementById('venue-price').textContent = `₹${venue.pricePerHour}`;
+
+      // 2. Setup Favorites
+      const favBtn = document.getElementById('fav-btn');
+      if (appState.isFavorite(venue.id)) {
+        favBtn.classList.add('active');
+      }
+      favBtn.addEventListener('click', () => {
+        const isFav = appState.toggleFavorite(venue.id);
+        if (isFav) {
+          favBtn.classList.add('active');
+          showToast('Added to favorites!');
+        } else {
+          favBtn.classList.remove('active');
+          showToast('Removed from favorites!');
+        }
+      });
+
+      // 3. Setup Dates
+      setupDates();
+
+      // 4. Setup Times
+      setupTimePickers();
+
+      // 5. Back Button
+      document.getElementById('back-btn').addEventListener('click', () => {
+        window.location.href = 'home.html';
+      });
+
+      // 6. Check Availability navigation
+      document.getElementById('check-availability-btn').addEventListener('click', () => {
+        if (calculatedDuration <= 0) {
+          showToast('Please select a valid time range!');
+          return;
+        }
+        
+        // Save state in localStorage
+        const draft = {
+          venueId: venue.id,
+          venueName: venue.name,
+          date: selectedDate,
+          startTime: startTime,
+          endTime: endTime,
+          duration: calculatedDuration,
+          totalPrice: totalPrice,
+          hourlyRate: venue.pricePerHour
+        };
+        appState.saveBookingDraft(draft);
+        
+        // Navigate
+        window.location.href = `availability.html?venueId=${venue.id}`;
+      });
+    });
+
+    // Toast Notification helper
+    function showToast(message) {
+      const toast = document.getElementById('toast-notify');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // Dynamic horizontal date generator
+    function setupDates() {
+      const scrollContainer = document.getElementById('date-picker-scroll');
+      const today = new Date();
+      
+      let dateOptions = [];
+      for (let i = 0; i < 5; i++) {
+        const d = new Date();
+        d.setDate(today.getDate() + i);
+        
+        // Format options
+        const iso = d.toISOString().split('T')[0];
+        let dayLabel = '';
+        if (i === 0) dayLabel = 'Today';
+        else if (i === 1) dayLabel = 'Tmrw';
+        else dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
+        
+        const dateNum = d.getDate();
+        const monthName = d.toLocaleDateString('en-US', { month: 'short' });
+        
+        dateOptions.push({
+          iso,
+          dayLabel,
+          dateNum,
+          monthName
+        });
+      }
+
+      // Pre-select tomorrow (index 1) as in the screenshot
+      selectedDate = dateOptions[1].iso;
+
+      let html = dateOptions.map(opt => {
+        const isActive = opt.iso === selectedDate ? 'active' : '';
+        return `
+          <div class="date-chip ${isActive}" data-date="${opt.iso}">
+            <span class="date-chip-day">${opt.dayLabel}</span>
+            <span class="date-chip-num">${opt.dateNum}</span>
+            <span class="date-chip-month">${opt.monthName}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Add Calendar picker button at end
+      html += `
+        <div class="date-calendar-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span>Pick Date</span>
+          <input type="date" id="calendar-input" class="hidden-date-input">
+        </div>
+      `;
+
+      scrollContainer.innerHTML = html;
+
+      // Handle clicking chips
+      document.querySelectorAll('.date-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          selectedDate = chip.getAttribute('data-date');
+          updateDateDisplay();
+        });
+      });
+
+      // Handle calendar select
+      const calendar = document.getElementById('calendar-input');
+      // Set min date to today
+      calendar.min = today.toISOString().split('T')[0];
+      calendar.addEventListener('change', (e) => {
+        if (e.target.value) {
+          selectedDate = e.target.value;
+          
+          // Clear active states on chips
+          document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+          
+          // Check if picked date matches one of our chips, if so activate it
+          const matchingChip = document.querySelector(`.date-chip[data-date="${selectedDate}"]`);
+          if (matchingChip) {
+            matchingChip.classList.add('active');
+          }
+          
+          updateDateDisplay();
+        }
+      });
+
+      updateDateDisplay();
+    }
+
+    function updateDateDisplay() {
+      // Update heading text
+      document.getElementById('selected-date-text').textContent = formatters.formatFullDate(selectedDate);
+      // Update summary
+      document.getElementById('sum-date').textContent = formatters.formatShortDate(selectedDate);
+    }
+
+    // Custom time input listener and update
+    function setupTimePickers() {
+      const startInput = document.getElementById('start-time-input');
+      const endInput = document.getElementById('end-time-input');
+
+      // Sync display labels initially
+      updateTimeDisplay('start', startTime);
+      updateTimeDisplay('end', endTime);
+      recalculateTotals();
+
+      startInput.addEventListener('input', (e) => {
+        startTime = e.target.value;
+        updateTimeDisplay('start', startTime);
+        recalculateTotals();
+      });
+
+      endInput.addEventListener('input', (e) => {
+        endTime = e.target.value;
+        updateTimeDisplay('end', endTime);
+        recalculateTotals();
+      });
+    }
+
+    function updateTimeDisplay(type, val) {
+      const formatted = formatters.formatTime12h(val);
+      document.getElementById(`${type}-time-display`).textContent = formatted;
+      document.getElementById(`sum-${type}`).textContent = formatted;
+    }
+
+    function recalculateTotals() {
+      calculatedDuration = bookingCalc.calculateDuration(startTime, endTime);
+      
+      const durationText = calculatedDuration === 1 ? '1 hour' : `${calculatedDuration} hours`;
+      const sessionText = `${calculatedDuration}h session`;
+      
+      // Update UI
+      document.getElementById('duration-badge-text').textContent = sessionText;
+      document.getElementById('sum-duration').textContent = calculatedDuration + 'h';
+      
+      // Total price
+      if (venue) {
+        totalPrice = bookingCalc.calculateTotal(venue.pricePerHour, calculatedDuration);
+        document.getElementById('sum-subtotal').textContent = `₹${venue.pricePerHour}/hr &bull; ${calculatedDuration}h`;
+        document.getElementById('sum-total-price').textContent = `₹${totalPrice}`;
+      }
+
+      // Check validation
+      const ctaBtn = document.getElementById('check-availability-btn');
+      if (calculatedDuration <= 0) {
+        ctaBtn.classList.add('disabled');
+      } else {
+        ctaBtn.classList.remove('disabled');
+      }
+    }
+  </script>
+</body>
+</html>
