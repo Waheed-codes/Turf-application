@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VenueX - Owner Login</title>
+  <meta name="description" content="Login to the VenueX Owner Portal to manage your venue's ground availability.">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/owner.css">
+</head>
+<body class="login-body">
+
+  <div class="login-card">
+    <!-- Logo -->
+    <div class="login-logo">
+      <div class="logo-grid">
+        <div class="logo-square green"></div>
+        <div class="logo-square"></div>
+        <div class="logo-square"></div>
+        <div class="logo-square"></div>
+      </div>
+      <div class="login-logo-text">VenueX</div>
+      <div class="login-logo-sub">Owner Portal</div>
+    </div>
+
+    <!-- Error -->
+    <div id="login-error" class="login-error">Invalid credentials. Please try again.</div>
+
+    <!-- Form -->
+    <form id="login-form" class="login-form" onsubmit="handleLogin(event)">
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required autocomplete="email">
+      </div>
+
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="login-btn">Log In</button>
+    </form>
+
+    <!-- Credentials Hint -->
+    <div class="login-hint">
+      <div class="login-hint-title">Demo Credentials</div>
+      <div class="login-hint-row">
+        <span class="label">Email</span>
+        <code>owner@venuex.com</code>
+      </div>
+      <div class="login-hint-row">
+        <span class="label">Password</span>
+        <code>venue123</code>
+      </div>
+      <button type="button" class="autofill-btn" onclick="autoFill()">Auto-fill Credentials</button>
+    </div>
+
+    <!-- Back -->
+    <a href="../index.html" class="login-back">&larr; Back to VenueX</a>
+  </div>
+
+  <script src="js/owner.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (isOwnerLoggedIn()) {
+      window.location.href = 'index.html';
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorEl = document.getElementById('login-error');
+
+      if (ownerLogin(email, password)) {
+        window.location.href = 'index.html';
+      } else {
+        errorEl.style.display = 'block';
+        document.getElementById('password').value = '';
+      }
+    }
+
+    function autoFill() {
+      document.getElementById('email').value = 'owner@venuex.com';
+      document.getElementById('password').value = 'venue123';
+      document.getElementById('login-error').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

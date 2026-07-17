@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VenueX - Owner Portal</title>
+  <meta name="description" content="Manage your venue's ground availability. Block time slots for maintenance or offline bookings with a single tap.">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/owner.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="portal-header">
+    <div class="portal-brand">
+      <div class="logo-grid">
+        <div class="logo-square green"></div>
+        <div class="logo-square"></div>
+        <div class="logo-square"></div>
+        <div class="logo-square"></div>
+      </div>
+      <span class="portal-brand-name">Owner Portal</span>
+    </div>
+    <button class="logout-btn" id="logout-btn">Log Out</button>
+  </header>
+
+  <!-- Content -->
+  <main class="portal-content">
+
+    <!-- 1. Venue Name -->
+    <section class="venue-name-section">
+      <h1 class="venue-name" id="venue-name">Greenfield Sports Arena</h1>
+      <p class="venue-location" id="venue-location">Koramangala, Hyderabad</p>
+    </section>
+
+    <!-- 2. Ground Selector + 3. Date Picker -->
+    <div class="controls-row">
+      <div class="control-group">
+        <label class="control-label" for="ground-select">Ground</label>
+        <select class="control-select" id="ground-select">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="date-picker">Date</label>
+        <input type="date" class="control-date" id="date-picker">
+      </div>
+    </div>
+
+    <!-- Status Legend -->
+    <div class="status-legend">
+      <div class="legend-item">
+        <span class="legend-dot available"></span>
+        <span>Available</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot offline"></span>
+        <span>Offline Booking</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot maintenance"></span>
+        <span>Maintenance</span>
+      </div>
+    </div>
+
+    <!-- 4. Daily Schedule -->
+    <section class="schedule-section">
+      <div class="schedule-title">Tap a slot to change its status</div>
+      <div class="slots-grid" id="slots-grid">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <script src="js/owner.js"></script>
+</body>
+</html>

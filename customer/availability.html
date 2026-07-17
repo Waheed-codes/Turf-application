@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VenueX - Ground Availability</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .header-compact {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .back-btn {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-pill);
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-main);
+      transition: all var(--transition);
+    }
+    .back-btn:hover { background-color: var(--bg-page); }
+    
+    .page-title {
+      font-size: 18px; font-weight: 700; color: var(--text-main);
+    }
+
+    .summary-card {
+      margin: 24px; padding: 20px;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+    .s-venue { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+    .s-details { font-size: 14px; color: var(--text-sub); line-height: 1.6; }
+    .s-details strong { color: var(--text-main); }
+
+    .grounds-container {
+      padding: 0 24px 24px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .ground-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      display: flex; flex-direction: column; gap: 16px;
+      transition: all var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .ground-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    
+    .g-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .g-title { font-size: 16px; font-weight: 700; color: var(--text-main); }
+    .g-surface { font-size: 13px; color: var(--text-sub); margin-top: 4px; }
+    
+    .g-price-block { text-align: right; }
+    .g-total { font-size: 18px; font-weight: 800; color: var(--text-main); }
+    .g-rate { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+    .g-amenities {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .g-amenity {
+      padding: 6px 12px;
+      background-color: var(--bg-page);
+      border-radius: var(--radius-pill);
+      font-size: 12px; font-weight: 500; color: var(--text-sub);
+    }
+
+    .status-msg {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-size: 14px; font-weight: 600;
+      padding: 12px; border-radius: var(--radius-md);
+      margin-bottom: 8px;
+    }
+    .status-msg.available {
+      background-color: rgba(34, 197, 94, 0.1); color: var(--status-available);
+    }
+    .status-msg.unavailable {
+      background-color: rgba(156, 163, 175, 0.1); color: var(--text-muted);
+    }
+    .status-msg.maintenance {
+      background-color: rgba(245, 158, 11, 0.1); color: var(--status-maintenance);
+    }
+
+    .book-btn {
+      width: 100%; height: 48px; border-radius: var(--radius-md);
+      font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif;
+      border: none; cursor: pointer; transition: all var(--transition);
+      background-color: var(--primary); color: #FFF;
+    }
+    .book-btn:hover:not(:disabled) { background-color: var(--primary-dark); transform: scale(0.98); }
+    .book-btn:disabled { background-color: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header-compact">
+      <button class="back-btn" id="back-btn">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <div class="page-title">Select Ground</div>
+    </div>
+
+    <div class="page page-no-nav">
+      
+      <div class="summary-card">
+        <div class="s-venue" id="ds-venue"></div>
+        <div class="s-details">
+          Date: <strong id="ds-date"></strong><br>
+          Time: <strong id="ds-time"></strong><br>
+          Duration: <strong id="ds-duration"></strong>
+        </div>
+      </div>
+
+      <div class="grounds-container" id="ground-list">
+        <!-- JS Populated -->
+      </div>
+      
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const draft = appState.getBookingDraft();
+      
+      if (!draft || !draft.venueId) {
+        window.location.href = 'home.html';
+        return;
+      }
+
+      document.getElementById('back-btn').addEventListener('click', () => {
+        window.location.href = `venue-details.html?id=${draft.venueId}`;
+      });
+
+      document.getElementById('ds-venue').textContent = draft.venueName;
+      document.getElementById('ds-date').textContent = formatters.formatFullDate(draft.date);
+      document.getElementById('ds-time').textContent = `${formatters.formatTime12h(draft.startTime)} - ${formatters.formatTime12h(draft.endTime)}`;
+      document.getElementById('ds-duration').textContent = `${draft.duration} hour${draft.duration > 1 ? 's' : ''}`;
+
+      const groundsList = document.getElementById('ground-list');
+      const grounds = GROUNDS[draft.venueId] || [];
+
+      if (grounds.length === 0) {
+        groundsList.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 40px;">No grounds available.</p>`;
+        return;
+      }
+
+      let html = '';
+      grounds.forEach(ground => {
+        const isOccupied = availabilityHelpers.isGroundOccupied(ground.id, draft.date, draft.startTime, draft.endTime);
+        const total = bookingCalc.calculateTotal(ground.pricePerHour, draft.duration);
+
+        let amHtml = (ground.amenities || []).map(a => `<div class="g-amenity">${a}</div>`).join('');
+        
+        let statusHtml = '';
+        let btnDisabled = '';
+        if (isOccupied) {
+          statusHtml = `<div class="status-msg unavailable"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> This time slot is unavailable.</div>`;
+          btnDisabled = 'disabled';
+        } else {
+          statusHtml = `<div class="status-msg available"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Slot Available</div>`;
+        }
+
+        html += `
+          <div class="ground-card">
+            <div class="g-header">
+              <div>
+                <div class="g-title">${ground.name}</div>
+                <div class="g-surface">${ground.surface} &bull; ${ground.capacity}</div>
+              </div>
+              <div class="g-price-block">
+                <div class="g-total">₹${total}</div>
+                <div class="g-rate">₹${ground.pricePerHour}/hr</div>
+              </div>
+            </div>
+            <div class="g-amenities">${amHtml}</div>
+            
+            <div>
+              ${statusHtml}
+              <button class="book-btn" ${btnDisabled} onclick="confirmBooking('${ground.id}', '${ground.name}', ${total})">Book Now</button>
+            </div>
+          </div>
+        `;
+      });
+
+      groundsList.innerHTML = html;
+    });
+
+    window.confirmBooking = function(id, name, total) {
+      const draft = appState.getBookingDraft();
+      const booking = {
+        venueId: draft.venueId,
+        venueName: draft.venueName,
+        groundId: id,
+        groundName: name,
+        date: draft.date,
+        startTime: draft.startTime,
+        endTime: draft.endTime,
+        duration: draft.duration,
+        totalPrice: total,
+        status: 'Confirmed'
+      };
+
+      const confirmed = appState.addBooking(booking);
+      localStorage.setItem('venuex_confirmed_booking', JSON.stringify(confirmed));
+      window.location.href = 'confirmation.html';
+    };
+  </script>
+</body>
+</html>

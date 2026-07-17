@@ -1,0 +1,176 @@
+:root {
+      --primary-color: #4B5563;       /* Slate Gray */
+      --primary-dark: #374151;        /* Darker Gray */
+      --accent-color: #374151;        /* Dark Gray */
+      --bg-white: #FFFFFF;
+      --bg-light: #FAFAFA;            /* Light Background */
+      --border-color: #E5E7EB;        /* Subtle Border Gray */
+      --text-primary: #111827;        /* Charcoal Black */
+      --text-secondary: #4B5563;      /* Dark Gray */
+      --text-muted: #9CA3AF;          /* Muted Gray */
+      --radius-lg: 16px;
+      --radius-xl: 16px;              /* Updated to match 16px standard */
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      text-align: center;
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo-section {
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      width: 48px;
+      height: 48px;
+    }
+
+    .logo-square {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background-color: var(--primary-color);
+    }
+
+    .logo-square.green {
+      background-color: var(--accent-color);
+    }
+
+    .logo-text {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    @media (max-width: 600px) {
+      .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    .portal-card {
+      background-color: var(--bg-white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 40px 30px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .portal-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-premium);
+      border-color: var(--primary-light);
+    }
+
+    .card-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .card-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      border: none;
+      background-color: var(--primary-color);
+      color: var(--bg-white);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      transition: background-color 0.2s ease;
+    }
+
+    .portal-card:hover .card-btn {
+      background-color: var(--primary-dark);
+    }
+
+    .portal-card.customer:hover .card-btn {
+      background-color: var(--accent-color);
+    }
+
+    .footer {
+      font-size: 12px;
+      color: var(--text-muted);
+    }

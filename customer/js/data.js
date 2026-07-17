@@ -16,7 +16,7 @@ const VENUES = [
     rating: 4.9,
     reviews: 312,
     distance: '1.2 km',
-    location: 'Koramangala, Bengaluru',
+    location: 'Koramangala, Hyderabad',
     pricePerHour: 800,
     availableToday: true,
     image: 'assets/football_turf.png'
@@ -28,7 +28,7 @@ const VENUES = [
     rating: 4.9,
     reviews: 420,
     distance: '2.3 km',
-    location: 'Koramangala, Bengaluru',
+    location: 'Koramangala, Hyderabad',
     pricePerHour: 2905,
     availableToday: true,
     image: 'assets/football_turf.png'
@@ -40,7 +40,7 @@ const VENUES = [
     rating: 4.7,
     reviews: 189,
     distance: '2.8 km',
-    location: 'Indiranagar, Bengaluru',
+    location: 'Indiranagar, Hyderabad',
     pricePerHour: 1200,
     availableToday: true,
     image: 'assets/football_turf.png' // Re-using football turf image for cricket/turf
@@ -52,7 +52,7 @@ const VENUES = [
     rating: 4.8,
     reviews: 140,
     distance: '3.5 km',
-    location: 'HSR Layout, Bengaluru',
+    location: 'HSR Layout, Hyderabad',
     pricePerHour: 600,
     availableToday: true,
     image: 'assets/badminton_court.png'
@@ -64,7 +64,7 @@ const VENUES = [
     rating: 4.6,
     reviews: 98,
     distance: '4.1 km',
-    location: 'Koramangala, Bengaluru',
+    location: 'Koramangala, Hyderabad',
     pricePerHour: 1500,
     availableToday: false,
     image: 'assets/basketball_court.png'
@@ -76,8 +76,68 @@ const VENUES = [
     rating: 4.9,
     reviews: 75,
     distance: '1.8 km',
-    location: 'Domlur, Bengaluru',
+    location: 'Domlur, Hyderabad',
     pricePerHour: 1000,
+    availableToday: true,
+    image: 'assets/pickleball_court.png'
+  },
+  {
+    id: 7,
+    name: 'Gully Cricket Academy',
+    category: 'cricket',
+    rating: 4.8,
+    reviews: 245,
+    distance: '3.4 km',
+    location: 'Koramangala, Hyderabad',
+    pricePerHour: 900,
+    availableToday: true,
+    image: 'assets/football_turf.png'
+  },
+  {
+    id: 8,
+    name: 'Chinnaswamy Nets & Turf',
+    category: 'cricket',
+    rating: 4.9,
+    reviews: 512,
+    distance: '5.1 km',
+    location: 'CBD, Hyderabad',
+    pricePerHour: 1500,
+    availableToday: false,
+    image: 'assets/football_turf.png'
+  },
+  {
+    id: 9,
+    name: 'Feather Shuttle Court',
+    category: 'badminton',
+    rating: 4.7,
+    reviews: 112,
+    distance: '2.1 km',
+    location: 'Domlur, Hyderabad',
+    pricePerHour: 500,
+    availableToday: true,
+    image: 'assets/badminton_court.png'
+  },
+  {
+    id: 10,
+    name: 'Downtown Basketball Arena',
+    category: 'basketball',
+    rating: 4.8,
+    reviews: 80,
+    distance: '3.9 km',
+    location: 'Indiranagar, Hyderabad',
+    pricePerHour: 1200,
+    availableToday: true,
+    image: 'assets/basketball_court.png'
+  },
+  {
+    id: 11,
+    name: 'Bounce Pickleball Club',
+    category: 'pickleball',
+    rating: 4.8,
+    reviews: 65,
+    distance: '2.5 km',
+    location: 'HSR Layout, Hyderabad',
+    pricePerHour: 900,
     availableToday: true,
     image: 'assets/pickleball_court.png'
   }
@@ -237,6 +297,97 @@ const GROUNDS = {
       capacity: '4 Players',
       amenities: ['Parking', 'Washroom', 'Lighting', 'Drinking Water'],
       pricePerHour: 1200,
+      available: true
+    }
+  ],
+  7: [
+    {
+      id: '7-a',
+      name: 'Indoor Cricket Lane A',
+      surface: 'AstroTurf',
+      capacity: '8 Players',
+      amenities: ['Lighting', 'Drinking Water'],
+      pricePerHour: 800,
+      available: true
+    },
+    {
+      id: '7-b',
+      name: 'Indoor Cricket Lane B',
+      surface: 'Concrete Pitch',
+      capacity: '8 Players',
+      amenities: ['Lighting', 'Drinking Water'],
+      pricePerHour: 600,
+      available: true
+    }
+  ],
+  8: [
+    {
+      id: '8-a',
+      name: 'Premium Turf Pitch A',
+      surface: 'Natural Grass',
+      capacity: '22 Players',
+      amenities: ['Parking', 'Washroom', 'Lighting', 'Drinking Water'],
+      pricePerHour: 1500,
+      available: false
+    },
+    {
+      id: '8-b',
+      name: 'Practice Net A',
+      surface: 'Synthetic Pitch',
+      capacity: '6 Players',
+      amenities: ['Lighting', 'Drinking Water'],
+      pricePerHour: 500,
+      available: true
+    }
+  ],
+  9: [
+    {
+      id: '9-a',
+      name: 'Wooden Court 1',
+      surface: 'Polished Maple',
+      capacity: '4 Players',
+      amenities: ['Washroom', 'Lighting', 'Drinking Water'],
+      pricePerHour: 500,
+      available: true
+    },
+    {
+      id: '9-b',
+      name: 'Wooden Court 2',
+      surface: 'Polished Maple',
+      capacity: '4 Players',
+      amenities: ['Washroom', 'Lighting', 'Drinking Water'],
+      pricePerHour: 500,
+      available: false
+    }
+  ],
+  10: [
+    {
+      id: '10-a',
+      name: 'Main Court (Indoor)',
+      surface: 'Hardwood',
+      capacity: '10 Players',
+      amenities: ['Parking', 'Washroom', 'Lighting', 'Drinking Water'],
+      pricePerHour: 1200,
+      available: true
+    }
+  ],
+  11: [
+    {
+      id: '11-a',
+      name: 'Cushion Court A',
+      surface: 'Acrylic Cushion',
+      capacity: '4 Players',
+      amenities: ['Parking', 'Washroom', 'Lighting', 'Drinking Water'],
+      pricePerHour: 900,
+      available: true
+    },
+    {
+      id: '11-b',
+      name: 'Cushion Court B',
+      surface: 'Acrylic Cushion',
+      capacity: '4 Players',
+      amenities: ['Parking', 'Washroom', 'Lighting', 'Drinking Water'],
+      pricePerHour: 900,
       available: true
     }
   ]

@@ -47,10 +47,10 @@ window.appState = {
 
   // Auth / Session
   getCurrentUser() {
-    return storage.get('user') || { name: 'Arjun Sharma', location: 'Bengaluru, Karnataka', avatar: 'AS' };
+    return storage.get('user') || { name: 'Arjun Sharma', location: 'Hyderabad, Karnataka', avatar: 'AS' };
   },
   login(name = 'Arjun Sharma') {
-    const user = { name, location: 'Bengaluru, Karnataka', avatar: name.split(' ').map(n => n[0]).join('').toUpperCase() };
+    const user = { name, location: 'Hyderabad, Karnataka', avatar: name.split(' ').map(n => n[0]).join('').toUpperCase() };
     storage.set('user', user);
     return user;
   },
@@ -174,6 +174,82 @@ window.formatters = {
       const weekday = targetDate.toLocaleDateString('en-US', { weekday: 'short' });
       return `${weekday}, ${monthName} ${dayNum}`;
     }
+  }
+};
+
+window.availabilityHelpers = {
+  // Convert HH:MM to total minutes from midnight
+  parseTimeToMinutes(timeStr) {
+    if (!timeStr) return 0;
+    const parts = timeStr.split(':');
+    if (parts.length !== 2) return 0;
+    return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+  },
+
+  // Check if a specific ground is occupied during the given time
+  isGroundOccupied(groundId, date, startTime, endTime) {
+    const startMin = this.parseTimeToMinutes(startTime);
+    const endMin = this.parseTimeToMinutes(endTime);
+
+    // Check confirmed customer bookings
+    const bookings = appState.getBookings();
+    for (const b of bookings) {
+      if (b.groundId === groundId && b.date === date) {
+        if (b.status === 'Confirmed' || b.status === 'Blocked') {
+          const bStart = this.parseTimeToMinutes(b.startTime);
+          const bEnd = this.parseTimeToMinutes(b.endTime);
+          // Overlap condition: start1 < end2 && start2 < end1
+          if (startMin < bEnd && bStart < endMin) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // Check owner portal blocked slots
+    try {
+      const ownerBlocked = localStorage.getItem(`venuex_owner_blocked_${groundId}_${date}`);
+      if (ownerBlocked) {
+        const blockedSlots = JSON.parse(ownerBlocked);
+        for (const slot of blockedSlots) {
+          const bStart = this.parseTimeToMinutes(slot.startTime);
+          const bEnd = this.parseTimeToMinutes(slot.endTime);
+          if (startMin < bEnd && bStart < endMin) {
+            return true;
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error reading owner blocked slots:', e);
+    }
+
+    return false;
+  },
+
+  // Check if a venue has at least one ground available during the given time
+  isVenueAvailable(venueId, date, startTime, endTime) {
+    // Determine the grounds for this venue
+    // The GROUNDS object is currently in availability.html or data.js. We need to ensure it's loaded.
+    // If GROUNDS is not defined globally in data.js, we assume 1 default ground if missing.
+    if (typeof window.GROUNDS === 'undefined' || !window.GROUNDS[venueId]) {
+      // Simulate at least one ground available if we don't have explicit ground data, but we do have owner blocks to check
+      // As a fallback, check groundId = "G-V{venueId}-1" (which is the format we used in owner portal)
+      const mockGroundId = `G-V${venueId}-1`;
+      return !this.isGroundOccupied(mockGroundId, date, startTime, endTime);
+    }
+
+    const venueGrounds = window.GROUNDS[venueId];
+    if (!venueGrounds || venueGrounds.length === 0) return false;
+
+    // Check if at least one ground is available
+    for (const ground of venueGrounds) {
+      // A ground is available if its static available flag is true AND it's not occupied
+      if (ground.available && !this.isGroundOccupied(ground.id, date, startTime, endTime)) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 };
 

@@ -3,29 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VenueX - Book Any Venue</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>VenueX - Portal Entry</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  
+  <link rel="stylesheet" href="css/root.css">
 </head>
 <body>
-  <div class="app-container">
-    <div class="splash-page">
-      <div class="logo-animation-container">
-        <div class="logo-grid">
-          <div class="logo-square green"></div>
-          <div class="logo-square"></div>
-          <div class="logo-square"></div>
-          <div class="logo-square"></div>
-        </div>
-        <div class="logo-text">VenueX</div>
+  <div class="container">
+    <div class="logo-section">
+      <div class="logo-grid">
+        <div class="logo-square green"></div>
+        <div class="logo-square"></div>
+        <div class="logo-square"></div>
+        <div class="logo-square"></div>
       </div>
+      <div class="logo-text">VenueX</div>
     </div>
-  </div>
 
-  <script>
-    // Redirect to login page after 1.5 seconds
-    setTimeout(() => {
-      window.location.href = 'login.html';
-    }, 1500);
-  </script>
+    <h1 class="title">Welcome to VenueX</h1>
+    <p class="subtitle">Access the booking platform to find and reserve sports arenas, or log into the owner portal to manage your venue availability.</p>
+
+    <div class="cards-grid">
+      <!-- Customer Card -->
+      <a href="customer/index.html" class="portal-card customer">
+        <div class="card-icon">🏟️</div>
+        <h2 class="card-title">Book a Venue</h2>
+        <p class="card-desc">Find and book football fields, cricket grounds, badminton courts, basketball nets, and pickleball arenas in real-time.</p>
+        <div class="card-btn">Enter Customer App</div>
+      </a>
+
+      <!-- Owner Portal Card -->
+      <a href="owner/login.html" class="portal-card admin">
+        <div class="card-icon">🔑</div>
+        <h2 class="card-title">Owner Portal</h2>
+        <p class="card-desc">For venue owners. Manage ground availability, block time slots for maintenance, and mark offline bookings with a single tap.</p>
+        <div class="card-btn">Enter Owner Portal</div>
+      </a>
+    </div>
+
+    <p class="footer">&copy; 2026 VenueX Operations. All rights reserved.</p>
+  </div>
 </body>
 </html>
