@@ -4,73 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VenueX - Booking Confirmed</title>
-  <link rel="stylesheet" href="css/style.css">
-  <style>
-    .conf-page {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 40px 24px;
-      background-color: var(--bg-page);
-    }
-    .success-icon {
-      width: 72px; height: 72px;
-      background-color: var(--status-available);
-      border-radius: var(--radius-pill);
-      display: flex; align-items: center; justify-content: center;
-      color: #FFF; margin-bottom: 24px;
-      box-shadow: 0 8px 16px rgba(34, 197, 94, 0.2);
-    }
-    .c-title {
-      font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; text-align: center;
-    }
-    .c-sub {
-      font-size: 14px; color: var(--text-sub); margin-bottom: 32px; text-align: center;
-    }
-
-    .ticket {
-      width: 100%; max-width: 360px;
-      background-color: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 24px; margin-bottom: 32px;
-      box-shadow: var(--shadow-md);
-      position: relative;
-    }
-    /* Ticket notches */
-    .ticket::before, .ticket::after {
-      content: ''; position: absolute; top: 70px;
-      width: 20px; height: 20px;
-      background-color: var(--bg-page);
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-    }
-    .ticket::before { left: -11px; border-right-color: transparent; border-top-color: transparent; border-bottom-color: transparent; transform: rotate(45deg); }
-    .ticket::after { right: -11px; border-left-color: transparent; border-top-color: transparent; border-bottom-color: transparent; transform: rotate(-45deg); }
-
-    .t-header { text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 24px; margin-bottom: 24px; }
-    .t-id { font-size: 13px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-    .t-val-id { font-size: 20px; font-weight: 800; color: var(--text-main); margin-top: 4px; }
-
-    .t-row { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 14px; }
-    .t-row:last-child { margin-bottom: 0; }
-    .t-label { color: var(--text-sub); }
-    .t-val { color: var(--text-main); font-weight: 600; text-align: right; }
-
-    .t-total-row {
-      margin-top: 24px; padding-top: 24px; border-top: 1px dashed var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .t-total-row .t-label { font-size: 16px; font-weight: 700; color: var(--text-main); }
-    .t-total-row .t-val { font-size: 24px; font-weight: 800; color: var(--primary); }
-
-    .home-btn {
-      width: 100%; max-width: 360px;
-    }
-  </style>
+  <link rel="stylesheet" href="css/customer.css">
 </head>
 <body>
   <div class="app-container">
-    <div class="page page-no-nav conf-page">
+    <div class="page page-no-nav conf-page" id="confirm-section">
+      <h1 class="c-title">Review Booking</h1>
+      <p class="c-sub">Please confirm your booking details.</p>
+      
+      <div class="confirm-details">
+        <div class="cd-row"><span class="cd-label">Venue</span> <span class="cd-val" id="cd-venue"></span></div>
+        <div class="cd-row"><span class="cd-label">Location</span> <span class="cd-val" id="cd-location"></span></div>
+        <div class="cd-row"><span class="cd-label">Activity</span> <span class="cd-val" id="cd-activity"></span></div>
+        <div class="cd-row"><span class="cd-label">Date</span> <span class="cd-val" id="cd-date"></span></div>
+        <div class="cd-row"><span class="cd-label">Time</span> <span class="cd-val" id="cd-time"></span></div>
+        <div class="cd-row"><span class="cd-label">Duration</span> <span class="cd-val" id="cd-duration"></span></div>
+        <div class="cd-total"><span class="cd-label" style="color:var(--text-main);">Total Price</span> <span class="cd-val" id="cd-total"></span></div>
+      </div>
+      
+      <button class="btn btn-primary home-btn" id="confirm-booking-btn">Confirm Booking</button>
+      <button class="btn home-btn" style="background:transparent; color:var(--text-sub); margin-top:12px; border:none; box-shadow:none;" onclick="window.location.href='home.html'">Cancel</button>
+    </div>
+
+    <div class="page page-no-nav conf-page hidden" id="success-section">
       
       <div class="success-icon">
         <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -82,19 +38,12 @@
       <p class="c-sub">Your slot has been successfully reserved.</p>
 
       <div class="ticket">
-        <div class="t-header">
-          <div class="t-id">Booking ID</div>
-          <div class="t-val-id" id="t-id"></div>
-        </div>
-
         <div class="t-row"><span class="t-label">Venue</span> <span class="t-val" id="t-venue"></span></div>
-        <div class="t-row"><span class="t-label">Ground</span> <span class="t-val" id="t-ground"></span></div>
         <div class="t-row"><span class="t-label">Date</span> <span class="t-val" id="t-date"></span></div>
         <div class="t-row"><span class="t-label">Time</span> <span class="t-val" id="t-time"></span></div>
-        <div class="t-row"><span class="t-label">Duration</span> <span class="t-val" id="t-duration"></span></div>
 
         <div class="t-total-row">
-          <span class="t-label">Paid</span>
+          <span class="t-label">Total Paid</span>
           <span class="t-val" id="t-total"></span>
         </div>
       </div>
@@ -105,24 +54,7 @@
   </div>
 
   <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const dataStr = localStorage.getItem('venuex_confirmed_booking');
-      if (!dataStr) {
-        window.location.href = 'home.html';
-        return;
-      }
-
-      const b = JSON.parse(dataStr);
-      document.getElementById('t-id').textContent = b.id;
-      document.getElementById('t-venue').textContent = b.venueName;
-      document.getElementById('t-ground').textContent = b.groundName;
-      document.getElementById('t-date').textContent = formatters.formatFullDate(b.date);
-      document.getElementById('t-time').textContent = `${formatters.formatTime12h(b.startTime)} - ${formatters.formatTime12h(b.endTime)}`;
-      document.getElementById('t-duration').textContent = `${b.duration} hour${b.duration > 1 ? 's' : ''}`;
-      document.getElementById('t-total').textContent = `₹${b.totalPrice}`;
-    });
-  </script>
+  <script src="js/customer.js"></script>
+  <script src="js/confirmation.js"></script>
 </body>
 </html>

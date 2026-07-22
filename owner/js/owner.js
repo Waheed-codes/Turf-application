@@ -24,11 +24,10 @@ const OWNER_CONFIG = {
 };
 
 // Status cycle order
-const STATUS_CYCLE = ['available', 'offline', 'maintenance'];
+const STATUS_CYCLE = ['available', 'booked'];
 const STATUS_LABELS = {
   available: 'Available',
-  offline: 'Offline Booking',
-  maintenance: 'Maintenance'
+  booked: 'Booked'
 };
 
 // --- Storage Helpers ---
@@ -69,13 +68,13 @@ function ownerLogin(email, password) {
 
 function ownerLogout() {
   ownerStorage.remove('logged_in');
-  window.location.href = 'login.html';
+  window.location.href = 'index.html';
 }
 
 function requireAuth() {
   const path = window.location.pathname;
-  if (!isOwnerLoggedIn() && !path.includes('login.html')) {
-    window.location.href = 'login.html';
+  if (!isOwnerLoggedIn() && !path.includes('index.html')) {
+    window.location.href = 'index.html';
   }
 }
 
@@ -140,15 +139,15 @@ function syncToCustomerStorage(groundId, dateStr, slots) {
     // Build a list of blocked time ranges for the customer app
     const blockedSlots = [];
     for (const [timeKey, status] of Object.entries(slots)) {
-      if (status === 'offline' || status === 'maintenance') {
+      if (status === 'booked') {
         const hour = parseInt(timeKey.split(':')[0]);
         blockedSlots.push({
           groundId: groundId,
           date: dateStr,
           startTime: timeKey,
           endTime: `${(hour + 1).toString().padStart(2, '0')}:00`,
-          status: status === 'offline' ? 'Blocked' : 'Blocked',
-          source: status === 'offline' ? 'Offline Booking' : 'Maintenance'
+          status: 'Booked',
+          source: 'Owner Portal'
         });
       }
     }
@@ -213,11 +212,8 @@ function renderSchedule(groundId, dateStr) {
     card.setAttribute('aria-label', `${formatSlotRange(h)} - ${STATUS_LABELS[status]}. Tap to change status.`);
 
     card.innerHTML = `
-      <span class="slot-time">${formatSlotRange(h)}</span>
-      <span class="slot-status">
-        <span class="slot-status-dot"></span>
-        <span class="slot-status-label">${STATUS_LABELS[status]}</span>
-      </span>
+      <span class="slot-time">${formatHour12(h)}</span>
+      <span class="slot-status-circle"></span>
     `;
 
     // Tap handler
@@ -226,8 +222,7 @@ function renderSchedule(groundId, dateStr) {
 
       // Update card classes
       card.className = `slot-card status-${newStatus}`;
-      card.querySelector('.slot-status-label').textContent = STATUS_LABELS[newStatus];
-      card.setAttribute('aria-label', `${formatSlotRange(h)} - ${STATUS_LABELS[newStatus]}. Tap to change status.`);
+      card.setAttribute('aria-label', `${formatHour12(h)} - ${STATUS_LABELS[newStatus]}. Tap to change status.`);
 
       // Tap animation
       card.classList.add('tapped');

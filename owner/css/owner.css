@@ -13,8 +13,7 @@
   --text-muted: #9CA3AF;
   --accent: #22C55E;
   --status-available: #22C55E;
-  --status-offline: #6B7280;
-  --status-maintenance: #F59E0B;
+  --status-booked: #EF4444;
   --radius: 16px;
   --radius-sm: 12px;
   --radius-xs: 8px;
@@ -428,12 +427,8 @@ body {
   background-color: var(--status-available);
 }
 
-.legend-dot.offline {
-  background-color: var(--status-offline);
-}
-
-.legend-dot.maintenance {
-  background-color: var(--status-maintenance);
+.legend-dot.booked {
+  background-color: var(--status-booked);
 }
 
 /* Schedule Grid */
@@ -482,14 +477,9 @@ body {
   border-left: 4px solid var(--status-available);
 }
 
-.slot-card.status-offline {
-  border-left: 4px solid var(--status-offline);
-  background: #F9FAFB;
-}
-
-.slot-card.status-maintenance {
-  border-left: 4px solid var(--status-maintenance);
-  background: #FFFBEB;
+.slot-card.status-booked {
+  border-left: 4px solid var(--status-booked);
+  background: #FEF2F2;
 }
 
 .slot-time {
@@ -498,43 +488,21 @@ body {
   color: var(--text-primary);
 }
 
-.slot-status {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.slot-status-dot {
-  width: 9px;
-  height: 9px;
+.slot-status-circle {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transition: background-color 0.2s ease;
 }
 
-.status-available .slot-status-dot {
+.status-available .slot-status-circle {
   background-color: var(--status-available);
 }
 
-.status-available .slot-status-label {
-  color: var(--status-available);
-}
-
-.status-offline .slot-status-dot {
-  background-color: var(--status-offline);
-}
-
-.status-offline .slot-status-label {
-  color: var(--status-offline);
-}
-
-.status-maintenance .slot-status-dot {
-  background-color: var(--status-maintenance);
-}
-
-.status-maintenance .slot-status-label {
-  color: var(--status-maintenance);
+.status-booked .slot-status-circle {
+  background-color: var(--status-booked);
 }
 
 /* Tap ripple feedback */
