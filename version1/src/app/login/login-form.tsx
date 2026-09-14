@@ -21,7 +21,7 @@ export default function LoginForm() {
 
     setError("");
     setIdentifier(identifier.trim());
-    router.push("/otp");
+    router.push("/otp?source=login");
   }
 
   return (
