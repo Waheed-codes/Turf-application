@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "@/app/globals.css";
+import { SessionNavigation } from "./session-navigation";
 import { LoginIdentifierProvider } from "./login-identifier";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body><LoginIdentifierProvider>{children}</LoginIdentifierProvider></body>
+      <body><SessionNavigation><LoginIdentifierProvider>{children}</LoginIdentifierProvider></SessionNavigation></body>
     </html>
   );
 }

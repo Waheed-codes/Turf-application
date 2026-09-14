@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { usePreviewSession } from "../session-navigation";
 import { useLoginIdentifier } from "../login-identifier";
 
 export default function OtpForm() {
   const { identifier } = useLoginIdentifier();
+  const { completePreviewLogin } = usePreviewSession();
   const [digits, setDigits] = useState<string[]>(Array(6).fill(""));
   const [message, setMessage] = useState("");
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
@@ -24,11 +26,11 @@ export default function OtpForm() {
         <p>We&apos;ve sent a 6-digit OTP to</p>
         <p className="font-semibold text-neutral-950 [overflow-wrap:anywhere]">{identifier || "No email or mobile number entered"}</p>
         <p className="mt-2 text-xs">UI preview only — no code has been sent.</p>
-        {!identifier && <Link href="/login" className="inline-block py-2 text-neutral-950 underline focus-visible:outline-2">Enter your email or mobile number</Link>}
+        {!identifier && <Link href="/login" replace className="inline-block py-2 text-neutral-950 underline focus-visible:outline-2">Enter your email or mobile number</Link>}
       </div>
       <form className="mt-10" onSubmit={(event) => {
         event.preventDefault();
-        if (complete) setMessage("OTP verification will be available when authentication is connected.");
+        if (complete) completePreviewLogin();
       }}>
         <fieldset>
           <legend className="mb-7 w-full">

@@ -25,7 +25,7 @@ export default function SignupForm() {
       return;
     }
     setIdentifier(`+91 ${mobile}`);
-    router.push("/otp?source=signup");
+    router.replace("/otp?source=signup");
   }
 
   return (

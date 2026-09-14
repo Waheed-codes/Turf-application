@@ -6,7 +6,7 @@ export default function LoginPage() {
     <main className="min-h-svh bg-white px-6 py-8 font-sans text-neutral-950 sm:py-16">
       <div className="mx-auto w-full max-w-sm">
         <Link
-          href="/"
+          href="/" replace
           aria-label="Back to landing page"
           className="inline-flex size-11 items-center justify-center rounded-full hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
         >
