@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "@/app/globals.css";
+import { LoginIdentifierProvider } from "./login-identifier";
 
 export const metadata: Metadata = {
   title: "Sports booking platform",
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><LoginIdentifierProvider>{children}</LoginIdentifierProvider></body>
     </html>
   );
 }

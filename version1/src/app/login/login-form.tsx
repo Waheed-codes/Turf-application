@@ -1,16 +1,17 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useLoginIdentifier } from "../login-identifier";
 
 export default function LoginForm() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [identifier, setIdentifier] = useState("");
+  const { identifier, setIdentifier } = useLoginIdentifier();
+  const router = useRouter();
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setNotice("");
 
     if (!identifier.trim()) {
       setError("Enter your email address or mobile number.");
@@ -19,9 +20,8 @@ export default function LoginForm() {
     }
 
     setError("");
-    // Future OTP navigation belongs here once that screen is implemented.
-    // Do not send, persist, or place the identifier in a URL at this stage.
-    setNotice("Verification is not available yet. Please try again later.");
+    setIdentifier(identifier.trim());
+    router.push("/otp");
   }
 
   return (
@@ -42,7 +42,6 @@ export default function LoginForm() {
         onChange={(event) => {
           setIdentifier(event.target.value);
           setError("");
-          setNotice("");
         }}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? "login-error" : undefined}
@@ -56,9 +55,6 @@ export default function LoginForm() {
       <button type="submit" className="mt-6 flex min-h-14 w-full items-center justify-center rounded-full bg-black px-6 py-4 text-base font-semibold text-white hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black">
         Next
       </button>
-      <p role="status" className="mt-4 text-center text-sm leading-6 text-neutral-600">
-        {notice}
-      </p>
     </form>
   );
 }
