@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 // UI-preview session only. This is not an authentication credential.
@@ -10,18 +17,26 @@ let memorySession = false;
 function subscribe(listener: () => void) {
   listeners.add(listener);
   window.addEventListener("storage", listener);
-  return () => { listeners.delete(listener); window.removeEventListener("storage", listener); };
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener("storage", listener);
+  };
 }
 function getSession() {
-  try { return localStorage.getItem(storageKey) === "signed-in"; }
-  catch { return memorySession; }
+  try {
+    return localStorage.getItem(storageKey) === "signed-in";
+  } catch {
+    return memorySession;
+  }
 }
 function writeSession(signedIn: boolean) {
   memorySession = signedIn;
   try {
     if (signedIn) localStorage.setItem(storageKey, "signed-in");
     else localStorage.removeItem(storageKey);
-  } catch { /* Browser storage may be unavailable; retain this tab's session. */ }
+  } catch {
+    /* Browser storage may be unavailable; retain this tab's session. */
+  }
   listeners.forEach((listener) => listener());
 }
 const SessionContext = createContext<{

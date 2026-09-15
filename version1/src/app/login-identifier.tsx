@@ -9,7 +9,11 @@ const IdentifierContext = createContext<{
 
 export function LoginIdentifierProvider({ children }: { children: ReactNode }) {
   const [identifier, setIdentifier] = useState("");
-  return <IdentifierContext.Provider value={{ identifier, setIdentifier }}>{children}</IdentifierContext.Provider>;
+  return (
+    <IdentifierContext.Provider value={{ identifier, setIdentifier }}>
+      {children}
+    </IdentifierContext.Provider>
+  );
 }
 
 export function useLoginIdentifier() {

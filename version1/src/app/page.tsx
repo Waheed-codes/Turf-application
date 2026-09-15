@@ -9,10 +9,25 @@ export default function LandingPage() {
     return (
       <main className="flex min-h-svh items-center bg-white px-6 py-12 font-sans text-neutral-950">
         <div className="mx-auto w-full max-w-sm text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
-          <p className="mt-4 text-base text-neutral-500">Your next game is waiting</p>
-          <Link href="/home" className="mt-10 flex min-h-14 items-center justify-center rounded-full border border-black bg-black px-6 py-4 font-semibold text-white hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black">Continue to home</Link>
-          <button type="button" onClick={logout} className="mt-6 min-h-11 rounded-full border border-neutral-200 px-6 text-sm text-neutral-600 hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black">Log out</button>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Welcome back
+          </h1>
+          <p className="mt-4 text-base text-neutral-500">
+            Your next game is waiting
+          </p>
+          <Link
+            href="/home"
+            className="mt-10 flex min-h-14 items-center justify-center rounded-full border border-black bg-black px-6 py-4 font-semibold text-white hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+          >
+            Continue to home
+          </Link>
+          <button
+            type="button"
+            onClick={logout}
+            className="mt-6 min-h-11 rounded-full border border-neutral-200 px-6 text-sm text-neutral-600 hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+          >
+            Log out
+          </button>
         </div>
       </main>
     );
