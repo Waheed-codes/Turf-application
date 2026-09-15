@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import CustomerNavigation from "@/components/navigation/customer-navigation";
 import { useState } from "react";
 import {
   dates,
@@ -216,6 +216,9 @@ export default function HomeScreen() {
         </p>
       </div>
 
+ V1-login-home
+      <CustomerNavigation active="/home" onUnavailable={setNotice} />
+
       <nav
         aria-label="Customer navigation"
         className="fixed inset-x-6 bottom-[calc(1rem+env(safe-area-inset-bottom))] mx-auto flex max-w-sm items-center justify-between rounded-full border border-neutral-100 bg-white p-2 shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
@@ -250,6 +253,7 @@ export default function HomeScreen() {
           </button>
         ))}
       </nav>
+main
     </main>
   );
 }
