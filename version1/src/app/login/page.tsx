@@ -6,12 +6,24 @@ export default function LoginPage() {
     <main className="min-h-svh bg-white px-6 py-8 font-sans text-neutral-950 sm:py-16">
       <div className="mx-auto w-full max-w-sm">
         <Link
-          href="/" replace
+          href="/"
+          replace
           aria-label="Back to landing page"
           className="inline-flex size-11 items-center justify-center rounded-full hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
         >
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-6">
-            <path d="M19 12H5m7-7-7 7 7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="size-6"
+          >
+            <path
+              d="M19 12H5m7-7-7 7 7 7"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </Link>
 
@@ -33,7 +45,9 @@ export default function LoginPage() {
 
         <div className="mt-12 flex items-center gap-4">
           <span aria-hidden="true" className="h-px flex-1 bg-neutral-200" />
-          <h1 className="text-xs font-semibold tracking-[0.15em] text-neutral-600">LOG IN</h1>
+          <h1 className="text-xs font-semibold tracking-[0.15em] text-neutral-600">
+            LOG IN
+          </h1>
           <span aria-hidden="true" className="h-px flex-1 bg-neutral-200" />
         </div>
 

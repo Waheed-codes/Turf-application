@@ -26,7 +26,10 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="mt-8">
-      <label htmlFor="login-identifier" className="block text-xs font-semibold tracking-wide text-neutral-600">
+      <label
+        htmlFor="login-identifier"
+        className="block text-xs font-semibold tracking-wide text-neutral-600"
+      >
         EMAIL OR MOBILE NUMBER
       </label>
       <input
@@ -48,11 +51,18 @@ export default function LoginForm() {
         placeholder="e.g. +91 98765 43210"
         className="mt-3 min-h-14 w-full min-w-0 rounded-2xl border border-neutral-300 bg-white px-4 py-4 text-base text-neutral-950 placeholder:text-neutral-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
       />
-      <p id="login-error" role="alert" className="mt-2 text-sm text-neutral-700">
+      <p
+        id="login-error"
+        role="alert"
+        className="mt-2 text-sm text-neutral-700"
+      >
         {error}
       </p>
 
-      <button type="submit" className="mt-6 flex min-h-14 w-full items-center justify-center rounded-full bg-black px-6 py-4 text-base font-semibold text-white hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black">
+      <button
+        type="submit"
+        className="mt-6 flex min-h-14 w-full items-center justify-center rounded-full bg-black px-6 py-4 text-base font-semibold text-white hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+      >
         Next
       </button>
     </form>

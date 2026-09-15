@@ -24,14 +24,27 @@ export default function OtpForm() {
     <>
       <div className="mt-4 text-center text-sm leading-6 text-neutral-500">
         <p>We&apos;ve sent a 6-digit OTP to</p>
-        <p className="font-semibold text-neutral-950 [overflow-wrap:anywhere]">{identifier || "No email or mobile number entered"}</p>
+        <p className="font-semibold text-neutral-950 [overflow-wrap:anywhere]">
+          {identifier || "No email or mobile number entered"}
+        </p>
         <p className="mt-2 text-xs">UI preview only — no code has been sent.</p>
-        {!identifier && <Link href="/login" replace className="inline-block py-2 text-neutral-950 underline focus-visible:outline-2">Enter your email or mobile number</Link>}
+        {!identifier && (
+          <Link
+            href="/login"
+            replace
+            className="inline-block py-2 text-neutral-950 underline focus-visible:outline-2"
+          >
+            Enter your email or mobile number
+          </Link>
+        )}
       </div>
-      <form className="mt-10" onSubmit={(event) => {
-        event.preventDefault();
-        if (complete) completePreviewLogin();
-      }}>
+      <form
+        className="mt-10"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (complete) completePreviewLogin();
+        }}
+      >
         <fieldset>
           <legend className="mb-7 w-full">
             <span className="flex items-center gap-4 text-xs font-semibold tracking-[0.2em] text-neutral-500">
@@ -44,7 +57,9 @@ export default function OtpForm() {
             {digits.map((digit, index) => (
               <input
                 key={index}
-                ref={(element) => { inputs.current[index] = element; }}
+                ref={(element) => {
+                  inputs.current[index] = element;
+                }}
                 aria-label={`OTP digit ${index + 1} of 6`}
                 type="text"
                 inputMode="numeric"
@@ -55,9 +70,14 @@ export default function OtpForm() {
                 onFocus={(event) => event.currentTarget.select()}
                 onChange={(event) => {
                   const value = event.target.value;
-                  if (/^[0-9]{6}$/.test(value)) { fillCode(value); return; }
+                  if (/^[0-9]{6}$/.test(value)) {
+                    fillCode(value);
+                    return;
+                  }
                   if (!/^[0-9]?$/.test(value)) return;
-                  setDigits((previous) => previous.map((entry, i) => i === index ? value : entry));
+                  setDigits((previous) =>
+                    previous.map((entry, i) => (i === index ? value : entry)),
+                  );
                   setMessage("");
                   if (value && index < 5) inputs.current[index + 1]?.focus();
                 }}
@@ -66,8 +86,14 @@ export default function OtpForm() {
                     event.preventDefault();
                     inputs.current[index - 1]?.focus();
                   }
-                  if (event.key === "ArrowLeft" && index > 0) { event.preventDefault(); inputs.current[index - 1]?.focus(); }
-                  if (event.key === "ArrowRight" && index < 5) { event.preventDefault(); inputs.current[index + 1]?.focus(); }
+                  if (event.key === "ArrowLeft" && index > 0) {
+                    event.preventDefault();
+                    inputs.current[index - 1]?.focus();
+                  }
+                  if (event.key === "ArrowRight" && index < 5) {
+                    event.preventDefault();
+                    inputs.current[index + 1]?.focus();
+                  }
                 }}
                 onPaste={(event) => {
                   event.preventDefault();
@@ -80,10 +106,31 @@ export default function OtpForm() {
         </fieldset>
         <p className="mt-7 text-center text-sm text-neutral-500">
           Didn&apos;t receive the code?{" "}
-          <button type="button" onClick={() => setMessage("OTP resend will be available when authentication is connected.")} className="min-h-11 font-semibold text-neutral-950 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4">Resend</button>
+          <button
+            type="button"
+            onClick={() =>
+              setMessage(
+                "OTP resend will be available when authentication is connected.",
+              )
+            }
+            className="min-h-11 font-semibold text-neutral-950 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
+          >
+            Resend
+          </button>
         </p>
-        <button type="submit" disabled={!complete} className="mt-7 flex min-h-14 w-full items-center justify-center rounded-full bg-black px-6 py-4 text-base font-semibold text-white enabled:hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black">Verify</button>
-        <p role="status" className="mt-4 text-center text-sm leading-6 text-neutral-600">{message}</p>
+        <button
+          type="submit"
+          disabled={!complete}
+          className="mt-7 flex min-h-14 w-full items-center justify-center rounded-full bg-black px-6 py-4 text-base font-semibold text-white enabled:hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+        >
+          Verify
+        </button>
+        <p
+          role="status"
+          className="mt-4 text-center text-sm leading-6 text-neutral-600"
+        >
+          {message}
+        </p>
       </form>
     </>
   );
