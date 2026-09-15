@@ -1,0 +1,16 @@
+import type { Venue, VenueSport } from "@/types/venue";
+
+export const venueSports: VenueSport[] = ["Badminton", "Box Cricket", "Football"];
+
+// Fictional listings and illustrative thumbnails, not live availability or prices.
+export const mockVenues: Venue[] = [
+  { id: "elite-smash", name: "Elite Smash Arena", sport: "Badminton", area: "Indiranagar", city: "Bangalore", rating: 4.9, startingPricePerHour: 800, image: "/images/venues/badminton.svg", imageDescription: "Illustrative badminton court", sports: ["Badminton"], amenities: ["Parking", "Changing Room", "Drinking Water", "Equipment Rental"], description: "Premium indoor badminton facility with professional courts, changing rooms and dedicated parking.", dimensions: "44 ft × 20 ft (per court)", surface: "Synthetic mat", setting: "Indoor", courts: 4, address: "Indiranagar, Bangalore, Karnataka (sample location)" },
+  { id: "shuttle-hub", name: "Shuttle Hub Sports", sport: "Badminton", area: "Koramangala", city: "Bangalore", rating: 4.7, startingPricePerHour: 650, image: "/images/venues/badminton.svg", imageDescription: "Illustrative badminton court", sports: ["Badminton"], amenities: ["Washrooms", "Drinking Water", "Seating"], description: "A relaxed indoor badminton space with two courts and seating for friends between games.", dimensions: "44 ft × 20 ft (per court)", surface: "Wooden flooring", setting: "Indoor", courts: 2, address: "Koramangala, Bangalore, Karnataka (sample location)" },
+  { id: "sixer-central", name: "Sixer Central Turf", sport: "Box Cricket", area: "Whitefield", city: "Bangalore", rating: 4.8, startingPricePerHour: 1200, image: "/images/venues/cricket.svg", imageDescription: "Illustrative box cricket ground", sports: ["Box Cricket"], amenities: ["Parking", "Floodlights", "Equipment Rental", "Washrooms"], description: "A net-enclosed outdoor cricket turf with floodlights for evening games and equipment available to rent.", dimensions: "100 ft × 60 ft", surface: "Synthetic turf", setting: "Outdoor", address: "Whitefield, Bangalore, Karnataka (sample location)" },
+  { id: "goal-post", name: "The Goal Post", sport: "Football", area: "Gachibowli", city: "Hyderabad", rating: 4.6, startingPricePerHour: 1500, image: "/images/venues/football.svg", imageDescription: "Illustrative football pitch", sports: ["Football"], amenities: ["Parking", "Changing Room", "Floodlights", "Drinking Water"], description: "An outdoor five-a-side football pitch with changing rooms and floodlights for evening matches.", dimensions: "120 ft × 70 ft", surface: "Synthetic turf", setting: "Outdoor", address: "Gachibowli, Hyderabad, Telangana (sample location)" },
+  { id: "kickoff-arena", name: "Kickoff Arena", sport: "Football", area: "Madhapur", city: "Hyderabad", rating: 4.8, startingPricePerHour: 1800, image: "/images/venues/football.svg", imageDescription: "Illustrative football pitch", sports: ["Football", "Box Cricket"], amenities: ["Floodlights", "Seating", "Washrooms"], description: "A versatile neighborhood turf for football and box cricket, with spectator seating and evening lighting.", dimensions: "110 ft × 65 ft", surface: "Synthetic turf", setting: "Outdoor", address: "Madhapur, Hyderabad, Telangana (sample location)" },
+];
+
+export function getMockVenue(id: string): Venue | undefined {
+  return mockVenues.find((venue) => venue.id === id);
+}

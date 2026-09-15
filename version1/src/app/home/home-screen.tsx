@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import CustomerNavigation from "@/components/navigation/customer-navigation";
 import { useState } from "react";
 import { dates, mockLocation, sports, timeOptions, upcomingGame, type UpcomingGame } from "@/data/mockHome";
 import HomeIcon from "./home-icon";
@@ -96,10 +96,7 @@ export default function HomeScreen() {
         <p className="mt-2 text-center text-[0.625rem] text-neutral-500">Preview · sample game and dates · no real bookings</p>
       </div>
 
-      <nav aria-label="Customer navigation" className="fixed inset-x-6 bottom-[calc(1rem+env(safe-area-inset-bottom))] mx-auto flex max-w-sm items-center justify-between rounded-full border border-neutral-100 bg-white p-2 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-        <Link href="/home" aria-label="Home" title="Home" aria-current="page" className={`flex min-h-11 w-1/4 items-center justify-center rounded-full bg-neutral-950 text-white ${focus}`}><HomeIcon name="home" /></Link>
-        {([{ label: "Search", icon: "search" }, { label: "Favourite", icon: "heart" }, { label: "Recent Bookings", icon: "bookings" }] as const).map((item) => <button key={item.label} type="button" aria-label={item.label} title={item.label} onClick={() => setNotice(`${item.label} will be available in a future update.`)} className={`flex min-h-11 w-1/4 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 ${focus}`}><HomeIcon name={item.icon} /></button>)}
-      </nav>
+      <CustomerNavigation active="/home" onUnavailable={setNotice} />
     </main>
   );
 }
