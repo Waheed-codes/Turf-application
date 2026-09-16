@@ -7,6 +7,7 @@ export type Venue = {
   area: string;
   city: string;
   rating: number;
+  mockDistanceKm: number;
   startingPricePerHour: number;
   image: string;
   imageDescription: string;
