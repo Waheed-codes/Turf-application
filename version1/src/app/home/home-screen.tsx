@@ -12,7 +12,8 @@ import {
   type UpcomingGame,
 } from "@/data/mockHome";
 import HomeIcon from "./home-icon";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { bookingQuery, readBookingContext } from "@/lib/booking-context";
 
 const focus =
   "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black";
@@ -38,6 +39,7 @@ function UpcomingGameBar({ game }: { game: UpcomingGame }) {
 }
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [sport, setSport] = useState("all");
   const [dates, setDates] = useState<HomeDate[]>([]);
@@ -89,7 +91,10 @@ export default function HomeScreen() {
             } else if (endTime <= startTime) {
               setNotice("Choose an end time later than the start time.");
             } else {
-              setNotice("Venue results are not available yet. No availability has been checked.");
+              const selectedSport = sport === "cricket" ? "Box Cricket" : sports.find((option) => option.id === sport)?.name;
+              const context = readBookingContext({ source: "availability", sport: selectedSport, date, start: startTime, end: endTime });
+              if (!context) { setNotice("Please choose a sport and a valid date before checking availability."); return; }
+              router.push(`/search?${bookingQuery(context)}&q=${encodeURIComponent(query)}`);
             }
           }}
         >

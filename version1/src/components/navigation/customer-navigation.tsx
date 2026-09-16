@@ -6,12 +6,12 @@ import HomeIcon from "@/app/home/home-icon";
 const items = [
   { label: "Home", icon: "home", href: "/home" },
   { label: "Search", icon: "search", href: "/search" },
-  { label: "Favorites", icon: "heart", href: null },
-  { label: "Recent Bookings", icon: "bookings", href: null },
+  { label: "Favorites", icon: "heart", href: "/favorites" },
+  { label: "Recent Bookings", icon: "bookings", href: "/bookings" },
 ] as const;
 
-export default function CustomerNavigation({ active, onUnavailable }: {
-  active: "/home" | "/search";
+export default function CustomerNavigation({ active }: {
+  active: "/home" | "/search" | "/favorites" | "/bookings";
   onUnavailable: (message: string) => void;
 }) {
   return (
@@ -19,10 +19,8 @@ export default function CustomerNavigation({ active, onUnavailable }: {
       {items.map((item) => {
         const selected = item.href === active;
         const className = `flex min-h-11 w-14 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black ${selected ? "bg-neutral-950 text-white" : "text-neutral-500 hover:bg-neutral-100"}`;
-        return item.href ? (
+        return (
           <Link key={item.label} href={item.href} aria-label={item.label} title={item.label} aria-current={selected ? "page" : undefined} className={className}><HomeIcon name={item.icon} /></Link>
-        ) : (
-          <button key={item.label} type="button" aria-label={item.label} title={item.label} className={className} onClick={() => onUnavailable(`${item.label} will be available in a future update.`)}><HomeIcon name={item.icon} /></button>
         );
       })}
     </nav>
