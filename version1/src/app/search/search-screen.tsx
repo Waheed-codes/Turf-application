@@ -35,13 +35,13 @@ export default function SearchScreen() {
       <div className="mx-auto w-full max-w-sm">
         <h1 className="text-2xl font-semibold tracking-tight">Find Venues</h1>
         <div className="mt-5 flex items-center gap-3">
-          <label className="flex min-h-12 min-w-0 flex-1 items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 shadow-xs focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-black">
+          <label className="flex min-h-12 min-w-0 flex-1 items-center gap-2 rounded-full bg-white px-3 shadow-sm">
             <HomeIcon name="search" className="size-4 shrink-0 text-neutral-400" />
             <span className="sr-only">Search venues, sports, or location</span>
             <input type="search" value={query} onChange={(event) => { setQuery(event.target.value); setNotice(""); }} placeholder="Search venues, sports, or location" className="min-h-12 w-full min-w-0 bg-transparent text-sm placeholder:text-neutral-400 focus:outline-none" />
           </label>
           <button type="button" aria-label="Filters" title="Filters" onClick={() => setNotice("Additional filters are not available yet.")} className="flex size-12 shrink-0 items-center justify-center rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="size-5"><path d="M3 7h8m4 0h6M3 17h3m4 0h11"/><circle cx="13" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="size-5"><path d="M3 7h8m4 0h6M3 17h3m4 0h11" /><circle cx="13" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
           </button>
         </div>
         <p role="status" aria-atomic="true" className="sr-only">{venues.length} venues found</p>

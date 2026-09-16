@@ -1,9 +1,10 @@
 "use client";
 
 import CustomerNavigation from "@/components/navigation/customer-navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  dates,
+  generateUpcomingDates,
+  type HomeDate,
   mockLocation,
   sports,
   timeOptions,
@@ -11,6 +12,7 @@ import {
   type UpcomingGame,
 } from "@/data/mockHome";
 import HomeIcon from "./home-icon";
+import Link from "next/link";
 
 const focus =
   "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black";
@@ -37,11 +39,20 @@ function UpcomingGameBar({ game }: { game: UpcomingGame }) {
 
 export default function HomeScreen() {
   const [query, setQuery] = useState("");
-  const [sport, setSport] = useState(sports[0].id);
-  const [date, setDate] = useState(dates[0].id);
-  const [startTime, setStartTime] = useState("20:00");
-  const [endTime, setEndTime] = useState("22:00");
+  const [sport, setSport] = useState("all");
+  const [dates, setDates] = useState<HomeDate[]>([]);
+  const [date, setDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    const generated = generateUpcomingDates(7);
+    setDates(generated);
+    setDate(generated[0].id);
+  }, []);
+
+  const displaySports = [{ id: "all", name: "All" }, ...sports];
 
   return (
     <main className="min-h-svh bg-neutral-50 px-6 pt-8 pb-[calc(8rem+env(safe-area-inset-bottom))] font-sans text-neutral-950">
@@ -69,22 +80,22 @@ export default function HomeScreen() {
           </button>
         </header>
 
-        <div className="mt-6">
-          <UpcomingGameBar game={upcomingGame} />
-        </div>
+
 
         <form
           className="mt-6"
           onSubmit={(event) => {
             event.preventDefault();
-            setNotice(
-              endTime <= startTime
-                ? "Choose an end time later than the start time."
-                : "Venue results are not available yet. No availability has been checked.",
-            );
+            if (!startTime || !endTime) {
+              setNotice("Please select a start and end time.");
+            } else if (endTime <= startTime) {
+              setNotice("Choose an end time later than the start time.");
+            } else {
+              setNotice("Venue results are not available yet. No availability has been checked.");
+            }
           }}
         >
-          <label className="flex min-h-12 items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 shadow-xs focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-black">
+          <label className="flex min-h-12 items-center gap-3 rounded-full bg-white px-4 shadow-sm">
             <HomeIcon
               name="search"
               className="size-5 shrink-0 text-neutral-400"
@@ -99,18 +110,18 @@ export default function HomeScreen() {
             />
           </label>
 
-          <fieldset className="mt-8">
+          <fieldset className="mt-8 min-w-0">
             <legend className="text-base font-semibold tracking-tight">
-              What do you want to play?
+              Select Sport
             </legend>
-            <div className="mt-5 grid grid-cols-3 gap-2">
-              {sports.map((option) => (
+            <div className="mt-5 flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              {displaySports.map((option) => (
                 <button
                   key={option.id}
                   type="button"
                   aria-pressed={sport === option.id}
                   onClick={() => setSport(option.id)}
-                  className={`min-h-11 rounded-full border px-2 py-2 text-xs font-semibold sm:text-sm ${focus} ${sport === option.id ? "border-neutral-950 bg-neutral-950 text-white" : "border-neutral-200 bg-white"}`}
+                  className={`shrink-0 min-h-11 min-w-[72px] rounded-full border px-5 py-2 text-xs font-semibold sm:text-sm ${focus} ${sport === option.id ? "border-neutral-950 bg-neutral-950 text-white" : "border-neutral-200 bg-white"}`}
                 >
                   {option.name}
                 </button>
@@ -118,11 +129,11 @@ export default function HomeScreen() {
             </div>
           </fieldset>
 
-          <fieldset className="mt-9">
+          <fieldset className="mt-9 min-w-0">
             <legend className="text-base font-semibold tracking-tight">
               Select date
             </legend>
-            <div className="mt-5 grid grid-cols-4 gap-3">
+            <div className="mt-5 flex gap-5 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {dates.map((option) => (
                 <button
                   key={option.id}
@@ -130,29 +141,31 @@ export default function HomeScreen() {
                   aria-label={option.label}
                   aria-pressed={date === option.id}
                   onClick={() => setDate(option.id)}
-                  className={`flex min-h-26 flex-col items-center justify-center rounded-full py-3 ${focus} ${date === option.id ? "bg-neutral-950 text-white shadow-md" : "text-neutral-800"}`}
+                  className={`relative flex h-[85px] w-[50px] shrink-0 flex-col items-center justify-center rounded-full ${date === option.id ? "bg-neutral-950 text-white" : "text-neutral-800"}`}
                 >
                   <span
-                    className={`text-[0.625rem] font-semibold ${date === option.id ? "text-neutral-300" : "text-neutral-500"}`}
+                    className={`text-[0.615rem] font-medium ${date === option.id ? "text-neutral-300" : "text-neutral-500"}`}
                   >
                     {option.weekday}
                   </span>
-                  <span className="mt-1 text-2xl leading-7 font-semibold">
+                  <span className=" text-[1.40rem] leading-[1.1] font-medium">
                     {option.day}
                   </span>
-                  <span className="mt-1 text-[0.625rem] font-semibold">
+                  <span
+                    className={`text-[0.825rem] font-medium ${date === option.id ? "text-neutral-300" : "text-neutral-500"}`}
+                  >
                     {option.month}
                   </span>
                   <span
                     aria-hidden="true"
-                    className={`mt-2 size-1 rounded-full ${date === option.id ? "bg-white" : "bg-transparent"}`}
+                    className={`absolute bottom-[6px] size-1 rounded-full ${date === option.id ? "bg-white" : "bg-transparent"}`}
                   />
                 </button>
               ))}
             </div>
           </fieldset>
 
-          <fieldset className="mt-8">
+          <fieldset className="mt-8 min-w-0">
             <legend className="text-base font-semibold tracking-tight">
               Select time
             </legend>
@@ -172,14 +185,26 @@ export default function HomeScreen() {
                       aria-label={kind === "start" ? "Start time" : "End time"}
                       value={kind === "start" ? startTime : endTime}
                       onChange={(event) => {
-                        (kind === "start" ? setStartTime : setEndTime)(
-                          event.target.value,
-                        );
+                        const newValue = event.target.value;
+                        if (kind === "start") {
+                          setStartTime(newValue);
+                          if (newValue >= endTime) {
+                            setEndTime("");
+                          }
+                        } else {
+                          setEndTime(newValue);
+                        }
                         setNotice("");
                       }}
-                      className={`min-h-14 w-full appearance-none rounded-full border border-neutral-200 bg-white py-3 pr-7 pl-3 text-sm font-semibold shadow-xs ${focus}`}
+                      className={`min-h-14 w-full appearance-none rounded-full border border-neutral-500 bg-white py-3 px-4 text-left text-sm font-semibold`}
                     >
-                      {timeOptions.map((option) => (
+                      <option value="" disabled hidden>
+                        0:00
+                      </option>
+                      {(kind === "end" && startTime
+                        ? timeOptions.filter((opt) => opt.value > startTime)
+                        : timeOptions
+                      ).map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
@@ -200,7 +225,7 @@ export default function HomeScreen() {
           </p>
           <button
             type="submit"
-            className={`mt-3 flex min-h-14 w-full items-center justify-center rounded-xl bg-neutral-950 px-4 py-4 text-sm font-semibold text-white shadow-md hover:bg-neutral-800 ${focus}`}
+            className={`mt-3 flex min-h-14 w-full items-center justify-center rounded-full bg-neutral-950 px-4 py-4 text-sm font-semibold text-white shadow-md hover:bg-neutral-800 ${focus}`}
           >
             Find Available Venues
           </button>
@@ -216,44 +241,7 @@ export default function HomeScreen() {
         </p>
       </div>
 
- V1-login-home
       <CustomerNavigation active="/home" onUnavailable={setNotice} />
-
-      <nav
-        aria-label="Customer navigation"
-        className="fixed inset-x-6 bottom-[calc(1rem+env(safe-area-inset-bottom))] mx-auto flex max-w-sm items-center justify-between rounded-full border border-neutral-100 bg-white p-2 shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
-      >
-        <Link
-          href="/home"
-          aria-label="Home"
-          title="Home"
-          aria-current="page"
-          className={`flex min-h-11 w-1/4 items-center justify-center rounded-full bg-neutral-950 text-white ${focus}`}
-        >
-          <HomeIcon name="home" />
-        </Link>
-        {(
-          [
-            { label: "Search", icon: "search" },
-            { label: "Favourite", icon: "heart" },
-            { label: "Recent Bookings", icon: "bookings" },
-          ] as const
-        ).map((item) => (
-          <button
-            key={item.label}
-            type="button"
-            aria-label={item.label}
-            title={item.label}
-            onClick={() =>
-              setNotice(`${item.label} will be available in a future update.`)
-            }
-            className={`flex min-h-11 w-1/4 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 ${focus}`}
-          >
-            <HomeIcon name={item.icon} />
-          </button>
-        ))}
-      </nav>
-main
     </main>
   );
 }
