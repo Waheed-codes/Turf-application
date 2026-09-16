@@ -37,12 +37,13 @@ export function generateUpcomingDates(days: number = 7): HomeDate[] {
   return upcomingDates;
 }
 
-export const timeOptions: TimeOption[] = Array.from({ length: 24 }, (_, i) => {
+export const timeOptions: TimeOption[] = Array.from({ length: 30 }, (_, i) => {
   const hour = i;
   const value = `${hour.toString().padStart(2, '0')}:00`;
-  const labelHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-  const ampm = hour < 12 ? 'AM' : 'PM';
-  const label = `${labelHour.toString().padStart(2, '0')}:00 ${ampm}`;
+  const displayHour = hour % 24;
+  const labelHour = displayHour === 0 ? 12 : displayHour > 12 ? displayHour - 12 : displayHour;
+  const ampm = displayHour < 12 ? 'AM' : 'PM';
+  const label = `${labelHour.toString().padStart(2, '0')}:00 ${ampm}${hour >= 24 ? ' (Next Day)' : ''}`;
   return { value, label };
 });
 export const upcomingGame: UpcomingGame = { venue: "ARENA X", countdown: "01:42:35" };

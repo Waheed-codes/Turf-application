@@ -86,9 +86,10 @@ export default function SignupForm() {
               className="min-h-12 w-full min-w-0 bg-transparent py-3 text-base placeholder:text-neutral-400 focus:outline-none"
               aria-invalid={Boolean(errors.mobile)}
               aria-describedby={`signup-country-code${errors.mobile ? " signup-mobile-error" : ""}`}
-              onChange={() =>
-                setErrors((previous) => ({ ...previous, mobile: "" }))
-              }
+              onChange={(e) => {
+                e.target.value = e.target.value.replace(/\D/g, "");
+                setErrors((previous) => ({ ...previous, mobile: "" }));
+              }}
             />
           </div>
           <p
@@ -153,7 +154,7 @@ export default function SignupForm() {
       </div>
       <button
         type="submit"
-        className="mt-7 flex min-h-14 w-full items-center justify-center rounded-2xl bg-black px-6 py-4 text-base font-semibold text-white hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+        className="mt-7 flex min-h-14 w-full items-center justify-center rounded-full bg-black px-6 py-4 text-base font-semibold text-white hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
       >
         Sign up
       </button>

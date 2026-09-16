@@ -3,7 +3,7 @@ import LoginForm from "./login-form";
 
 export default function LoginPage() {
   return (
-    <main className="min-h-svh bg-white px-6 py-8 font-sans text-neutral-950 sm:py-16">
+    <main className="min-h-svh bg-white px-6 pt-4 pb-8 font-sans text-neutral-950 sm:py-12">
       <div className="mx-auto w-full max-w-sm">
         <Link
           href="/"
@@ -27,14 +27,14 @@ export default function LoginPage() {
           </svg>
         </Link>
 
-        <div className="mt-10 text-center">
+        <div className="mt-4 text-center">
           <div
             aria-label="Logo placeholder"
             className="flex min-h-10 items-center justify-center px-4 text-xs font-semibold tracking-[0.2em]"
           >
             LOGO
           </div>
-          <p className="mt-5 text-[clamp(1.75rem,7.7vw,2.125rem)] leading-[1.18] font-semibold tracking-tight">
+          <p className="mt-4 text-[clamp(1.75rem,7.7vw,2.125rem)] leading-[1.18] font-semibold tracking-tight">
             Book premium
             <br />
             venues for your next
@@ -43,7 +43,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="mt-12 flex items-center gap-4">
+        <div className="mt-7 flex items-center gap-4">
           <span aria-hidden="true" className="h-px flex-1 bg-neutral-200" />
           <h1 className="text-xs font-semibold tracking-[0.15em] text-neutral-600">
             LOG IN

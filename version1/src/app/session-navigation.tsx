@@ -3,12 +3,10 @@
 import {
   createContext,
   useContext,
-  useEffect,
-  useRef,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 // UI-preview session only. This is not an authentication credential.
 const storageKey = "sports-booking-preview-session";
@@ -46,38 +44,22 @@ const SessionContext = createContext<{
 } | null>(null);
 
 export function SessionNavigation({ children }: { children: ReactNode }) {
-  const signedIn = useSyncExternalStore(subscribe, getSession, () => null);
-  const pathname = usePathname();
+  const signedIn = useSyncExternalStore(subscribe, getSession, () => false);
   const router = useRouter();
-  const continueAfterLogin = useRef(false);
-  const authPage = ["/login", "/signup", "/otp"].includes(pathname);
-
-  useEffect(() => {
-    if (signedIn && pathname === "/" && continueAfterLogin.current) {
-      continueAfterLogin.current = false;
-      router.push("/home");
-    } else if (signedIn && authPage) {
-      router.replace("/");
-    }
-  }, [signedIn, pathname, authPage, router]);
 
   function completePreviewLogin() {
-    continueAfterLogin.current = true;
     writeSession(true);
-    // All auth steps replace the same entry. Restore it to the landing before
-    // pushing Home, giving Back a safe destination even for direct OTP visits.
-    router.replace("/");
+    router.replace("/home");
   }
 
   function logout() {
-    continueAfterLogin.current = false;
     writeSession(false);
     router.replace("/");
   }
 
   return (
     <SessionContext.Provider value={{ signedIn, completePreviewLogin, logout }}>
-      {signedIn === null || (signedIn && authPage) ? null : children}
+      {children}
     </SessionContext.Provider>
   );
 }
