@@ -1,3 +1,5 @@
+import { withPlayingAreas } from "./mockPlayingAreas";
+import { mockAvailabilityVenues } from "./mockAvailabilityVenues";
 import type { Venue, VenueSport } from "@/types/venue";
 
 export const venueSports: VenueSport[] = ["Badminton", "Box Cricket", "Football"];
@@ -16,7 +18,7 @@ export const mockVenues: Venue[] = venueFixtures.map((venue) => ({
   sportConfigurations: Object.fromEntries(venue.sports.map((sport) => {
     const primary = sport === venue.sport;
     const hourlyPrice = Math.round(venue.startingPricePerHour * (primary ? 1 : 0.85));
-    return [sport, {
+    return [sport, withPlayingAreas({
       dimensions: primary ? venue.dimensions : "100 ft × 60 ft",
       surface: primary ? venue.surface : "Synthetic turf",
       count: sport === "Badminton" ? (venue.courts ?? 2) : sport === "Box Cricket" ? 2 : 1,
@@ -24,10 +26,10 @@ export const mockVenues: Venue[] = venueFixtures.map((venue) => ({
       hourlyPrice,
       blockedHours: [9, 13],
       priceByHour: { 8: hourlyPrice + 200, 18: Math.round(hourlyPrice * 1.2), 19: Math.round(hourlyPrice * 1.2), 20: Math.round(hourlyPrice * 1.2) },
-    }];
+    })];
   })),
 }));
 
 export function getMockVenue(id: string): Venue | undefined {
-  return mockVenues.find((venue) => venue.id === id);
+  return [...mockVenues, ...mockAvailabilityVenues].find((venue) => venue.id === id);
 }

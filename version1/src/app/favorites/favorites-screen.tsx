@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useState } from "react";
 import CustomerNavigation from "@/components/navigation/customer-navigation";
 import HomeIcon from "@/app/home/home-icon";
+import { mockAvailabilityVenues } from "@/data/mockAvailabilityVenues";
 import { mockVenues } from "@/data/mockVenues";
 import { useFavorites } from "@/hooks/use-favorites";
 
 export default function FavoritesScreen() {
   const { favoriteIds, removeFavorite } = useFavorites();
   const [notice, setNotice] = useState("");
-  const venues = mockVenues.filter((venue) => favoriteIds.includes(venue.id));
+  const venues = [...mockVenues, ...mockAvailabilityVenues].filter((venue) => favoriteIds.includes(venue.id));
 
   return (
     <main className="min-h-svh bg-neutral-50 px-6 pt-8 pb-[calc(8rem+env(safe-area-inset-bottom))] font-sans text-neutral-950">

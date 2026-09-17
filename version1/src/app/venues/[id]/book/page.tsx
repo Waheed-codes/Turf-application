@@ -8,7 +8,7 @@ export default async function BookingPlaceholder({ params, searchParams }: { par
   const venue = getMockVenue((await params).id);
   if (!venue) notFound();
   const candidate = readBookingContext(await searchParams);
-  const context = candidate && mockAvailable(venue, candidate) ? candidate : null;
+  const context = candidate && (candidate.source !== "availability" || candidate.slots?.length) && mockAvailable(venue, candidate) ? candidate : null;
   return <main className="min-h-svh bg-white px-6 py-12 font-sans text-neutral-950"><div className="mx-auto max-w-sm">
     <Link href={`/venues/${venue.id}${context ? `?${bookingQuery(context)}` : ""}`} replace className="inline-flex min-h-11 items-center text-sm underline focus-visible:outline-2">Back to venue</Link>
     <h1 className="mt-8 text-2xl font-semibold">Book {venue.name}</h1>

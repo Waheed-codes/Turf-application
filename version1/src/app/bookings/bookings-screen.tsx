@@ -40,6 +40,9 @@ export default function BookingsScreen({ bookings }: { bookings: Booking[] }) {
                   </span>
                   <span className={`shrink-0 rounded border px-2 py-1 text-[0.5625rem] font-semibold tracking-wide ${statusStyles[booking.status]}`}>{booking.status}</span>
                 </button>
+                {venue && (booking.status === "COMPLETED" || booking.status === "CANCELLED") && <div className="flex justify-end pb-2">
+                  <Link href={`/venues/${venue.id}?${new URLSearchParams({ source: "book-again", sport: booking.sport })}`} aria-label={`Book ${venue.name} again`} className="inline-flex min-h-11 items-center rounded-md px-3 text-xs font-semibold text-neutral-700 hover:bg-neutral-100 hover:text-black active:bg-neutral-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">Book Again <span aria-hidden="true" className="ml-1">→</span></Link>
+                </div>}
               </li>;
             })}
           </ul>
@@ -51,7 +54,6 @@ export default function BookingsScreen({ bookings }: { bookings: Booking[] }) {
           </section>
         )}
         <p role="status" className="mt-4 text-center text-sm leading-5 text-neutral-600">{notice}</p>
-        {bookings.length > 0 && <p className="mt-3 text-center text-[0.625rem] text-neutral-500">Sample bookings · not real reservations</p>}
       </div>
       <CustomerNavigation active="/bookings" onUnavailable={setNotice} />
     </main>

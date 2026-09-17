@@ -2,10 +2,9 @@
 
 import DateSelector from "@/components/booking/date-selector";
 import CustomerNavigation from "@/components/navigation/customer-navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   generateUpcomingDates,
-  type HomeDate,
   mockLocation,
   sports,
   timeOptions,
@@ -13,8 +12,9 @@ import {
   type UpcomingGame,
 } from "@/data/mockHome";
 import HomeIcon from "./home-icon";
-import { useRouter } from "next/navigation";
-import { bookingQuery, readBookingContext } from "@/lib/booking-context";
+import VenueCard from "@/components/venues/venue-card";
+import { mockAvailabilityVenues } from "@/data/mockAvailabilityVenues";
+import { venueAvailabilityContext, readAvailabilityContext, type AvailabilityContext } from "@/lib/booking-context";
 
 const focus =
   "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black";
@@ -39,21 +39,21 @@ function UpcomingGameBar({ game }: { game: UpcomingGame }) {
   );
 }
 
-export default function HomeScreen() {
-  const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [sport, setSport] = useState("all");
-  const [dates, setDates] = useState<HomeDate[]>([]);
-  const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+export default function HomeScreen({ initialContext, initialQuery = "" }: { initialContext?: AvailabilityContext | null; initialQuery?: string }) {
+  const [submitted, setSubmitted] = useState<AvailabilityContext | null>(null);
+  const [query, setQuery] = useState(initialQuery);
+  const [sport, setSport] = useState(initialContext?.sport === "Box Cricket" ? "cricket" : initialContext?.sport.toLowerCase() ?? "all");
+  const [dates] = useState(() => generateUpcomingDates(7, initialContext?.date));
+  const [date, setDate] = useState(() => dates[0].id);
+  const [startTime, setStartTime] = useState(initialContext?.start ?? "04:00");
+  const [endTime, setEndTime] = useState(initialContext?.end ?? "11:00");
   const [notice, setNotice] = useState("");
 
-  useEffect(() => {
-    const generated = generateUpcomingDates(7);
-    setDates(generated);
-    setDate(generated[0].id);
-  }, []);
+  const results = submitted ? mockAvailabilityVenues.flatMap((venue) => {
+    const context = venueAvailabilityContext(venue, submitted);
+    const matches = [venue.name, venue.area, venue.city, ...venue.sports].some((value) => value.toLowerCase().includes(query.trim().toLowerCase()));
+    return context && matches ? [{ venue, context }] : [];
+  }) : [];
 
   const displaySports = [{ id: "all", name: "All" }, ...sports];
 
@@ -92,10 +92,11 @@ export default function HomeScreen() {
             } else if (endTime <= startTime) {
               setNotice("Choose an end time later than the start time.");
             } else {
-              const selectedSport = sport === "cricket" ? "Box Cricket" : sports.find((option) => option.id === sport)?.name;
-              const context = readBookingContext({ source: "availability", sport: selectedSport, date, start: startTime, end: endTime });
+              const selectedSport = sport === "all" ? "all" : sport === "cricket" ? "Box Cricket" : sports.find((option) => option.id === sport)?.name;
+              const context = readAvailabilityContext({ source: "availability", sport: selectedSport, date, start: startTime, end: endTime });
               if (!context) { setNotice("Please choose a sport and a valid date before checking availability."); return; }
-              router.push(`/search?${bookingQuery(context)}&q=${encodeURIComponent(query)}`);
+              setNotice("");
+              setSubmitted(context);
             }
           }}
         >
@@ -108,7 +109,7 @@ export default function HomeScreen() {
             <input
               type="search"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => { setQuery(event.target.value); setSubmitted(null); }}
               placeholder="Search venues, areas, or locations"
               className="min-h-11 w-full min-w-0 bg-transparent text-sm placeholder:text-neutral-400 focus:outline-none"
             />
@@ -124,7 +125,7 @@ export default function HomeScreen() {
                   key={option.id}
                   type="button"
                   aria-pressed={sport === option.id}
-                  onClick={() => setSport(option.id)}
+                  onClick={() => { setSport(option.id); setSubmitted(null); }}
                   className={`shrink-0 min-h-10 min-w-[68px] rounded-full border px-4 py-1.5 text-xs font-semibold sm:text-sm ${focus} ${sport === option.id ? "border-neutral-950 bg-neutral-950 text-white" : "border-neutral-200 bg-white"}`}
                 >
                   {option.name}
@@ -133,45 +134,7 @@ export default function HomeScreen() {
             </div>
           </fieldset>
 
- V1-login-home
-          <DateSelector dates={dates} date={date} onChange={setDate} />
-
-          <fieldset className="mt-5 min-w-0">
-            <legend className="text-sm font-semibold tracking-tight">
-              Select date
-            </legend>
-            <div className="mt-2.5 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              {dates.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  aria-label={option.label}
-                  aria-pressed={date === option.id}
-                  onClick={() => setDate(option.id)}
-                  className={`relative flex h-[76px] w-[48px] shrink-0 flex-col items-center justify-center rounded-full ${date === option.id ? "bg-neutral-950 text-white" : "text-neutral-800"}`}
-                >
-                  <span
-                    className={`text-[0.615rem] font-medium ${date === option.id ? "text-neutral-300" : "text-neutral-500"}`}
-                  >
-                    {option.weekday}
-                  </span>
-                  <span className="text-[1.3rem] leading-[1.1] font-medium">
-                    {option.day}
-                  </span>
-                  <span
-                    className={`text-[0.75rem] font-medium ${date === option.id ? "text-neutral-300" : "text-neutral-500"}`}
-                  >
-                    {option.month}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className={`absolute bottom-[5px] size-1 rounded-full ${date === option.id ? "bg-white" : "bg-transparent"}`}
-                  />
-                </button>
-              ))}
-            </div>
-          </fieldset>
- main
+          <DateSelector dates={dates} date={date} onChange={(value) => { setDate(value); setSubmitted(null); }} />
 
           <fieldset className="mt-5 min-w-0">
             <legend className="text-sm font-semibold tracking-tight">
@@ -193,6 +156,7 @@ export default function HomeScreen() {
                       aria-label={kind === "start" ? "Start time" : "End time"}
                       value={kind === "start" ? startTime : endTime}
                       onChange={(event) => {
+                        setSubmitted(null);
                         const newValue = event.target.value;
                         if (kind === "start") {
                           setStartTime(newValue);
@@ -240,6 +204,15 @@ export default function HomeScreen() {
             Find Available Venues
           </button>
         </form>
+        <div aria-live="polite">
+          {submitted && <section aria-labelledby="available-venues" className="mt-7">
+            <h2 id="available-venues" className="text-xl font-semibold">Available Venues ({results.length})</h2>
+            {results.length ? <ul className="mt-4 space-y-3">{results.map(({ venue, context }) => <li key={venue.id}><VenueCard venue={venue} bookingContext={context} /></li>)}</ul> : <div className="py-8 text-center">
+              <h3 className="text-lg font-semibold">No venues available</h3>
+              <p className="mt-2 text-sm leading-6 text-neutral-500">No venues are available for this sport and time. Try changing your date or time.</p>
+            </div>}
+          </section>}
+        </div>
         <p
           role="status"
           className="mt-2 text-center text-sm leading-5 text-neutral-600"

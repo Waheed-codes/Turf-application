@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import HomeIcon from "@/app/home/home-icon";
 import { useFavorites } from "@/hooks/use-favorites";
-import { type BookingContext } from "@/lib/booking-context";
-import BookingSelection, { BookingCta, BookingSummary, PriceDetails, SportDetails } from "./booking-selection";
-import type { Venue } from "@/types/venue";
+import { bookingQuery, resolvedSlots, type BookingContext } from "@/lib/booking-context";
+import BookingSelection, { BookingCta, BookingSummary, PriceDetails } from "./booking-selection";
+import type { Venue, VenueSport } from "@/types/venue";
 
 const action = "flex size-11 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-950 shadow-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black";
 
@@ -23,9 +23,14 @@ function MapPreview({ address }: { address: string }) {
   </section>;
 }
 
-export default function VenueDetails({ venue, bookingContext, initialDate }: { venue: Venue; bookingContext: BookingContext | null; initialDate: string }) {
+export default function VenueDetails({ venue, bookingContext, initialDate, initialSport }: { venue: Venue; bookingContext: BookingContext | null; initialDate: string; initialSport?: VenueSport }) {
   const preselected = bookingContext?.source === "availability";
-  const [selection, setSelection] = useState<BookingContext | null>(bookingContext);
+  function validSelection(context: BookingContext | null): BookingContext | null {
+    if (!context) return null;
+    const slots = resolvedSlots(venue, context);
+    return slots.length ? { ...context, areaId: slots[0].areaId, slots } : null;
+  }
+  const [selection, setSelection] = useState<BookingContext | null>(() => validSelection(bookingContext));
 
   const router = useRouter();
   const { favoriteIds, toggleFavorite } = useFavorites();
@@ -57,7 +62,7 @@ export default function VenueDetails({ venue, bookingContext, initialDate }: { v
       <div className="mx-auto w-full max-w-md">
         <div className="relative h-64 bg-neutral-200 sm:h-80">
           <Image src={venue.image} alt={venue.imageDescription} fill priority sizes="(max-width: 448px) 100vw, 448px" className="object-cover grayscale" />
-          <button type="button" aria-label="Back" onClick={() => { if (window.history.length > 1) router.back(); else router.replace("/search"); }} className={`absolute top-6 left-6 ${action}`}>
+          <button type="button" aria-label="Back" onClick={() => { if (bookingContext?.source === "availability") router.push(`/home?${bookingQuery({ ...bookingContext, sport: bookingContext.searchSport ?? bookingContext.sport, slots: undefined, areaId: undefined })}`); else if (window.history.length > 1) router.back(); else router.replace("/search"); }} className={`absolute top-6 left-6 ${action}`}>
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="size-5"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
           </button>
           <div className="absolute right-6 bottom-10 flex gap-3">
@@ -71,7 +76,7 @@ export default function VenueDetails({ venue, bookingContext, initialDate }: { v
             <span aria-label={`Rating ${venue.rating} out of 5`} className="shrink-0 rounded-md bg-neutral-100 px-2 py-1 text-xs font-semibold">★ {venue.rating.toFixed(1)}</span>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-500"><HomeIcon name="location" className="size-4" /><span>{venue.area}, {venue.city}</span><span className="rounded bg-neutral-100 px-2 py-1 text-[0.625rem] font-semibold text-neutral-700 uppercase">{venue.sport}</span></div>
-          {preselected && selection ? <><section className="mt-7"><h2 className="text-base font-semibold">Available Sports</h2><p className="mt-3 text-sm font-semibold">{selection.sport}</p></section><SportDetails venue={venue} sport={selection.sport} /></> : <BookingSelection venue={venue} initialDate={initialDate} context={selection} onChange={setSelection} />}
+          <BookingSelection initialSport={initialSport} venue={venue} initialDate={initialDate} context={selection} requested={preselected ? bookingContext! : undefined} onChange={(context) => setSelection(validSelection(context))} />
           {selection && <BookingSummary venue={venue} context={selection} />}
           {selection && <PriceDetails venue={venue} context={selection} />}
           <section className="mt-7" aria-labelledby="amenities"><h2 id="amenities" className="text-xs font-semibold tracking-widest text-neutral-500">AMENITIES</h2><ul className="mt-3 flex flex-wrap gap-2">{venue.amenities.map((amenity) => <li key={amenity} className="rounded-full border border-neutral-100 bg-neutral-50 px-3 py-2 text-xs text-neutral-600"><span aria-hidden="true" className="mr-1">✓</span>{amenity}</li>)}</ul></section>
