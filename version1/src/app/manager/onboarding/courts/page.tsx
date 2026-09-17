@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useSetupEdit } from "@/components/manager/use-setup-edit";
 import { useRouter } from "next/navigation";
 import { services, customSportIcon, resourceTypes, terminology, useManagerOnboarding, type PlayingArea } from "@/components/manager/manager-onboarding-provider";
 
@@ -12,6 +13,7 @@ function AreaIcon() {
 
 export default function Page() {
   const router = useRouter();
+  const { settingsEdit, destination } = useSetupEdit();
   const { selectedSports, playingAreas: areas, setPlayingAreas: setAreas } = useManagerOnboarding();
   const sports = selectedSports.map((sport) => ({ ...sport, icon: services.find((service) => service.id === sport.id)?.icon ?? customSportIcon }));
   const [editing, setEditing] = useState<{ id: string; name: string } | null>(null);
@@ -65,7 +67,7 @@ export default function Page() {
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white font-sans text-neutral-900">
       <header className="border-b border-neutral-200 pt-[env(safe-area-inset-top)]">
         <div className="flex h-[72px] items-center gap-2 px-4">
-          <button type="button" aria-label="Back to Select Services" onClick={() => router.push("/manager/onboarding/services")} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
+          <button type="button" aria-label={settingsEdit ? "Back to Settings" : "Go back"} onClick={() => router.push(destination("/manager/onboarding/services"))} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m14 6-6 6 6 6M8 12h12" /></svg>
           </button>
           <p className="text-lg font-semibold">Name Your Courts</p>
@@ -75,7 +77,7 @@ export default function Page() {
         {sports.length === 0 ? (
           <div className="space-y-4">
             <h1 className="text-xl font-semibold">No sports selected.</h1>
-            <button type="button" onClick={() => router.push("/manager/onboarding/services")} className="min-h-12 rounded-2xl bg-neutral-900 px-5 py-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">Select Sports</button>
+            <button type="button" onClick={() => router.push(settingsEdit ? "/manager/onboarding/services?mode=edit&from=settings" : "/manager/onboarding/services")} className="min-h-12 rounded-2xl bg-neutral-900 px-5 py-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">Select Sports</button>
           </div>
         ) : <>
         <h1 className="text-[26px] leading-8 font-bold tracking-tight">Confirm your court names</h1>
@@ -128,7 +130,7 @@ export default function Page() {
         </>}
       </main>
       {sports.length > 0 && <footer className="sticky bottom-0 border-t border-neutral-100 bg-white px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-        <button type="button" disabled={!canContinue} onClick={() => { if (canContinue) router.push("/manager/onboarding/location"); }} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors">Save &amp; Continue</button>
+        <button type="button" disabled={!canContinue} onClick={() => { if (canContinue) router.push(destination("/manager/onboarding/location")); }} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors">{settingsEdit ? "Save Changes" : "Save & Continue"}</button>
       </footer>}
     </div>
   );

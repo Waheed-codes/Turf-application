@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
+import { useSetupEdit } from "@/components/manager/use-setup-edit";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DAY_MINUTES, durations, useManagerOnboarding, type PlayingArea } from "@/components/manager/manager-onboarding-provider";
 
@@ -74,12 +75,13 @@ export default function Page() {
 
 function SlotsPage() {
   const router = useRouter();
+  const { settingsEdit, destination } = useSetupEdit();
   const { playingAreas } = useManagerOnboarding();
   if (playingAreas.length === 0) return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white font-sans text-neutral-900">
       <header className="border-b border-neutral-200 pt-[env(safe-area-inset-top)]">
         <div className="flex h-[72px] items-center gap-2 px-4">
-          <button type="button" aria-label="Back to Amenities" onClick={() => router.push("/manager/onboarding/amenities")} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
+          <button type="button" aria-label={settingsEdit ? "Back to Settings" : "Back to Amenities"} onClick={() => router.push(destination("/manager/onboarding/amenities"))} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m14 6-6 6 6 6M8 12h12" /></svg>
           </button>
           <p className="text-lg font-semibold">Set Time Slots</p>
@@ -87,7 +89,7 @@ function SlotsPage() {
       </header>
       <main className="space-y-4 px-6 py-6">
         <h1 className="text-xl font-semibold">No playing areas configured.</h1>
-        <button type="button" onClick={() => router.push("/manager/onboarding/courts")} className="min-h-12 rounded-2xl bg-neutral-900 px-5 py-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">Set Up Playing Areas</button>
+        <button type="button" onClick={() => router.push(settingsEdit ? "/manager/onboarding/courts?mode=edit&from=settings" : "/manager/onboarding/courts")} className="min-h-12 rounded-2xl bg-neutral-900 px-5 py-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">Set Up Playing Areas</button>
       </main>
     </div>
   );
@@ -96,6 +98,7 @@ function SlotsPage() {
 
 function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
   const router = useRouter();
+  const { settingsEdit, destination } = useSetupEdit();
   const searchParams = useSearchParams();
   const editMode = searchParams.get("mode") === "edit";
   const initialResource = resources.find((resource) => resource.id === searchParams.get("resourceId")) ?? resources[0];
@@ -118,7 +121,7 @@ function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
     if (availableCount === 0) return;
     if (editMode) {
       setDashboardSelection((current) => ({ ...current, sportId: selectedResource.sportId, resourceId: selectedResourceId }));
-      router.push("/manager/dashboard");
+      router.push(destination("/manager/dashboard"));
       return;
     }
     if (isFinalResource) router.push("/manager/onboarding/banking");
@@ -129,7 +132,7 @@ function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white font-sans text-neutral-900">
       <header className="border-b border-neutral-200 pt-[env(safe-area-inset-top)]">
         <div className="flex h-[72px] items-center gap-2 px-4">
-          <button type="button" aria-label={editMode ? "Back to Dashboard" : "Back to Amenities"} onClick={() => router.push(editMode ? "/manager/dashboard" : "/manager/onboarding/amenities")} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
+          <button type="button" aria-label={settingsEdit ? "Back to Settings" : editMode ? "Back to Dashboard" : "Back to Amenities"} onClick={() => router.push(destination(editMode ? "/manager/dashboard" : "/manager/onboarding/amenities"))} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m14 6-6 6 6 6M8 12h12" /></svg>
           </button>
           <p className="text-lg font-semibold">Set Time Slots</p>

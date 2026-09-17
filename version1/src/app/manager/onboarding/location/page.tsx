@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { useSetupEdit } from "@/components/manager/use-setup-edit";
+import { useManagerOnboarding } from "@/components/manager/manager-onboarding-provider";
 import { useRouter } from "next/navigation";
 
 // UI-only service areas; replace this list with a location source in a later phase.
@@ -30,10 +32,9 @@ function Divider() {
 
 export default function Page() {
   const router = useRouter();
-  const [mapsUrl, setMapsUrl] = useState("");
+  const { settingsEdit, destination } = useSetupEdit();
+  const { mapsUrl, setMapsUrl, selectedArea, setSelectedArea, mockDetected, setMockDetected } = useManagerOnboarding();
   const [search, setSearch] = useState("");
-  const [selectedArea, setSelectedArea] = useState("");
-  const [mockDetected, setMockDetected] = useState(false);
   const [mapExpanded, setMapExpanded] = useState(false);
   const filteredAreas = areas.filter((area) => area.name.toLowerCase().includes(search.trim().toLowerCase()));
   const canContinue = Boolean(mapsUrl.trim() || selectedArea || mockDetected);
@@ -49,7 +50,7 @@ export default function Page() {
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-neutral-50 font-sans text-neutral-900">
       <header className="border-b border-neutral-200 bg-white pt-[env(safe-area-inset-top)]">
         <div className="flex h-[72px] items-center gap-2 px-4">
-          <button type="button" aria-label="Back to Select Services" onClick={() => router.push("/manager/onboarding/services")} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
+          <button type="button" aria-label={settingsEdit ? "Back to Settings" : "Go back"} onClick={() => router.push(destination("/manager/onboarding/services"))} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
             <Icon><path d="m14 6-6 6 6 6M8 12h12" /></Icon>
           </button>
           <h1 className="text-lg font-semibold">Venue Location</h1>
@@ -118,8 +119,8 @@ export default function Page() {
       </main>
 
       <footer className="sticky bottom-0 border-t border-neutral-100 bg-white px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-        <button type="button" disabled={!canContinue} onClick={() => { if (canContinue) router.push("/manager/onboarding/photos"); }} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors">
-          Save &amp; Continue
+        <button type="button" disabled={!canContinue} onClick={() => { if (canContinue) router.push(destination("/manager/onboarding/photos")); }} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors">
+          {settingsEdit ? "Save Changes" : "Save & Continue"}
         </button>
       </footer>
     </div>

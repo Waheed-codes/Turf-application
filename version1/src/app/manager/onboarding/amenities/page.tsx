@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useSetupEdit } from "@/components/manager/use-setup-edit";
+import { useManagerOnboarding } from "@/components/manager/manager-onboarding-provider";
 import { useRouter } from "next/navigation";
 
 type Amenity = { id: string; label: string; icon: ReactNode };
@@ -18,8 +20,8 @@ const amenities: Amenity[] = [
 
 export default function Page() {
   const router = useRouter();
-  const [selectedIds, setSelectedIds] = useState<string[]>(["washroom", "water", "floodlights"]);
-  const [customAmenities, setCustomAmenities] = useState<Amenity[]>([]);
+  const { settingsEdit, destination } = useSetupEdit();
+  const { selectedAmenityIds: selectedIds, setSelectedAmenityIds: setSelectedIds, customAmenities, setCustomAmenities } = useManagerOnboarding();
   const [amenityName, setAmenityName] = useState("");
   const [error, setError] = useState("");
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -57,8 +59,8 @@ export default function Page() {
         <div className="flex h-[72px] items-center gap-2 px-4">
           <button
             type="button"
-            aria-label="Back to Venue Description"
-            onClick={() => router.push("/manager/onboarding/description")}
+            aria-label={settingsEdit ? "Back to Settings" : "Go back"}
+            onClick={() => router.push(destination("/manager/onboarding/description"))}
             className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -118,10 +120,10 @@ export default function Page() {
         <button
           type="button"
           disabled={selectedIds.length === 0}
-          onClick={() => { if (selectedIds.length > 0) router.push("/manager/onboarding/slots"); }}
+          onClick={() => { if (selectedIds.length > 0) router.push(destination("/manager/onboarding/slots")); }}
           className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors"
         >
-          Save &amp; Continue
+          {settingsEdit ? "Save Changes" : "Save & Continue"}
         </button>
       </footer>
 

@@ -1,0 +1,6 @@
+import { AdminIcon, type AdminIconName } from "./admin-icon";
+
+export function AdminStatCard({ label, value, trend, icon, compact = false }: { label: string; value: string; trend?: string; icon: AdminIconName; compact?: boolean }) {
+  if (compact) return <div className="flex min-w-0 items-center gap-4 rounded-xl border border-neutral-100 bg-white px-4 py-4 shadow-xs"><span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600"><AdminIcon name={icon} className="size-5" /></span><div><dt className="text-[11px] font-semibold tracking-wider text-neutral-500">{label}</dt><dd className="mt-0.5 text-xl font-bold tabular-nums">{value}</dd></div></div>;
+  return <div className="min-w-0 rounded-xl border border-neutral-100 bg-white px-5 py-5 shadow-xs"><div className="flex items-start justify-between gap-2"><div className="min-w-0"><dt className="text-xs font-medium text-neutral-400">{label}</dt><dd className="mt-1 text-[30px] leading-10 font-bold tracking-tight tabular-nums">{value}</dd></div><span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-700"><AdminIcon name={icon} className="size-5" /></span></div>{trend && <p className="mt-2 flex items-center gap-1 text-xs text-neutral-600"><AdminIcon name="arrow" className="size-3" />{trend}</p>}</div>;
+}

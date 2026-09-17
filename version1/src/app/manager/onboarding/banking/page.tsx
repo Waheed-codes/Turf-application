@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useSetupEdit } from "@/components/manager/use-setup-edit";
 import { useRouter } from "next/navigation";
 
 type Details = {
@@ -37,6 +38,7 @@ function validate(details: Details): Partial<Record<Field, string>> {
 
 export default function Page() {
   const router = useRouter();
+  const { settingsEdit } = useSetupEdit();
   const [details, setDetails] = useState<Details>(emptyDetails);
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
   const errors = validate(details);
@@ -46,7 +48,7 @@ export default function Page() {
     // This preview never submits or persists banking details, including on completion.
     setDetails({ ...emptyDetails });
     setTouched({});
-    router.push(destination);
+    router.push(settingsEdit ? "/manager/settings" : destination);
   }
 
   function saveDetails(event: FormEvent<HTMLFormElement>) {
@@ -59,7 +61,7 @@ export default function Page() {
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white font-sans text-neutral-900">
       <header className="border-b border-neutral-200 pt-[env(safe-area-inset-top)]">
         <div className="flex h-[72px] items-center gap-2 px-4">
-          <button type="button" aria-label="Back to Set Time Slots" onClick={() => leavePage("/manager/onboarding/slots")} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
+          <button type="button" aria-label={settingsEdit ? "Back to Settings" : "Go back"} onClick={() => leavePage("/manager/onboarding/slots")} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m14 6-6 6 6 6M8 12h12" /></svg>
           </button>
           <p className="text-lg font-semibold">Banking Details</p>
@@ -102,7 +104,7 @@ export default function Page() {
       </main>
 
       <footer className="sticky bottom-0 border-t border-neutral-100 bg-white px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-        <button type="submit" form="banking-details" disabled={!canSave} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors">Save Details</button>
+        <button type="submit" form="banking-details" disabled={!canSave} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors">{settingsEdit ? "Save Changes" : "Save Details"}</button>
       </footer>
     </div>
   );

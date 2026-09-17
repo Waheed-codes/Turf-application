@@ -1,0 +1,21 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { adminProfile } from "@/data/admin/mockAdmin";
+import { AdminIcon } from "./admin-icon";
+
+export function AdminHeader({ onOpenNavigation }: { onOpenNavigation: () => void }) {
+  const [search, setSearch] = useState("");
+  const [panel, setPanel] = useState<"notifications" | "profile" | null>(null);
+  return <header className="relative z-20 flex min-h-[72px] flex-wrap items-center justify-between gap-3 border-b border-neutral-200 bg-white px-4 py-3 sm:px-8">
+    <div className="flex min-w-0 flex-1 items-center gap-3"><button type="button" aria-label="Open Admin navigation" aria-haspopup="dialog" onClick={onOpenNavigation} className="flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-neutral-100 focus-visible:outline-2 lg:hidden"><AdminIcon name="menu" className="size-5" /></button>
+      <div className="relative w-full max-w-[400px]"><label htmlFor="admin-search" className="sr-only">Search venues, managers, bookings</label><span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-neutral-400"><AdminIcon name="search" /></span><input id="admin-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search venues, managers, bookings..." aria-describedby={search ? "admin-search-note" : undefined} className="h-[42px] w-full min-w-0 rounded-lg border border-neutral-200 bg-neutral-50 pr-3 pl-10 text-sm placeholder:text-neutral-400 focus-visible:outline-2 focus-visible:outline-neutral-700" />{search && <p id="admin-search-note" role="status" className="absolute top-full left-0 mt-2 w-full rounded-lg border border-neutral-200 bg-white p-3 text-xs leading-5 text-neutral-500 shadow-sm">Global search is coming soon.</p>}</div>
+    </div>
+    <div className="flex items-center gap-2 sm:gap-4">
+      <button type="button" aria-label="Notifications" aria-expanded={panel === "notifications"} aria-controls="admin-notifications" onClick={() => setPanel(panel === "notifications" ? null : "notifications")} className="relative flex size-10 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 focus-visible:outline-2"><AdminIcon name="bell" className="size-5" /><span className="absolute top-2 right-2 size-1.5 rounded-full bg-neutral-900" /></button>
+      <button type="button" aria-label="Admin profile" aria-expanded={panel === "profile"} aria-controls="admin-profile" onClick={() => setPanel(panel === "profile" ? null : "profile")} className="flex min-h-10 items-center gap-3 rounded-lg text-left focus-visible:outline-2"><span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-xs font-bold">{adminProfile.initials}</span><span className="hidden sm:block"><span className="block text-sm font-semibold">{adminProfile.name}</span><span className="block text-[11px] text-neutral-400">{adminProfile.role}</span></span><AdminIcon name="chevron" className="hidden size-4 text-neutral-400 sm:block" /></button>
+    </div>
+    {panel && <section id={panel === "notifications" ? "admin-notifications" : "admin-profile"} aria-label={panel === "notifications" ? "Notifications" : "Admin profile"} onKeyDown={(event) => { if (event.key === "Escape") setPanel(null); }} className="absolute top-full right-4 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-neutral-200 bg-white p-4 shadow-lg"><div className="flex items-center justify-between gap-2"><h2 className="text-sm font-semibold">{panel === "notifications" ? "Notifications" : adminProfile.name}</h2><button type="button" aria-label="Close panel" onClick={() => setPanel(null)} className="flex size-8 items-center justify-center rounded-md hover:bg-neutral-100 focus-visible:outline-2"><AdminIcon name="close" /></button></div><p className="mt-2 text-xs leading-5 text-neutral-500">{panel === "notifications" ? "You’re viewing the Admin preview. Live notifications are coming soon." : "Super Admin · Preview account"}</p>{panel === "profile" && <Link href="/admin/settings" onClick={() => setPanel(null)} className="mt-3 inline-flex min-h-10 items-center text-sm font-medium underline underline-offset-4 focus-visible:outline-2">Admin Settings</Link>}</section>}
+  </header>;
+}

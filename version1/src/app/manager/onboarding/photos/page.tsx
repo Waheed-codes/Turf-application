@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
+import { useSetupEdit } from "@/components/manager/use-setup-edit";
+import { useManagerOnboarding } from "@/components/manager/manager-onboarding-provider";
 import { useRouter } from "next/navigation";
 
 const MIN_PHOTOS = 3;
@@ -10,22 +12,14 @@ type VenuePhoto = { id: string; name: string; previewUrl: string };
 
 export default function Page() {
   const router = useRouter();
-  const [photos, setPhotos] = useState<VenuePhoto[]>([]);
+  const { settingsEdit, destination } = useSetupEdit();
+  const { photos, setPhotos } = useManagerOnboarding();
   const [notice, setNotice] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const previewUrls = useRef(new Set<string>());
   const canContinue = photos.length >= MIN_PHOTOS;
   const canAdd = photos.length < MAX_PHOTOS;
   const emptyTiles = Math.max(0, MAX_PHOTOS - photos.length - (canAdd ? 1 : 0));
 
-  useEffect(() => {
-    const urls = previewUrls.current;
-    // Keep previews alive between renders; release remaining URLs on unmount.
-    return () => {
-      urls.forEach((url) => URL.revokeObjectURL(url));
-      urls.clear();
-    };
-  }, []);
 
   function selectPhotos(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
@@ -36,7 +30,6 @@ export default function Page() {
     const remaining = MAX_PHOTOS - photos.length;
     const additions = images.slice(0, remaining).map((file) => {
       const previewUrl = URL.createObjectURL(file);
-      previewUrls.current.add(previewUrl);
       return { id: crypto.randomUUID(), name: file.name, previewUrl };
     });
     setPhotos((current) => [...current, ...additions]);
@@ -48,8 +41,6 @@ export default function Page() {
 
   function removePhoto(photo: VenuePhoto) {
     setPhotos((current) => current.filter((item) => item.id !== photo.id));
-    URL.revokeObjectURL(photo.previewUrl);
-    previewUrls.current.delete(photo.previewUrl);
     setNotice("");
   }
 
@@ -63,7 +54,7 @@ export default function Page() {
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white font-sans text-neutral-900">
       <header className="border-b border-neutral-200 pt-[env(safe-area-inset-top)]">
         <div className="flex h-[72px] items-center gap-2 px-4">
-          <button type="button" aria-label="Back to Venue Location" onClick={() => router.push("/manager/onboarding/location")} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
+          <button type="button" aria-label={settingsEdit ? "Back to Settings" : "Go back"} onClick={() => router.push(destination("/manager/onboarding/location"))} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m14 6-6 6 6 6M8 12h12" /></svg>
           </button>
           <p className="text-lg font-semibold">Venue Photos</p>
@@ -105,8 +96,8 @@ export default function Page() {
       </main>
 
       <footer className="sticky bottom-0 border-t border-neutral-100 bg-white px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-        <button type="button" disabled={!canContinue} onClick={() => { if (canContinue) router.push("/manager/onboarding/description"); }} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors">
-          Save &amp; Continue
+        <button type="button" disabled={!canContinue} onClick={() => { if (canContinue) router.push(destination("/manager/onboarding/description")); }} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors">
+          {settingsEdit ? "Save Changes" : "Save & Continue"}
         </button>
       </footer>
     </div>
