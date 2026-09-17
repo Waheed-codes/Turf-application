@@ -2,88 +2,163 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
-  useRef,
-  useSyncExternalStore,
+  useState,
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-// UI-preview session only. This is not an authentication credential.
-const storageKey = "sports-booking-preview-session";
-const listeners = new Set<() => void>();
-let memorySession = false;
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  window.addEventListener("storage", listener);
-  return () => {
-    listeners.delete(listener);
-    window.removeEventListener("storage", listener);
-  };
+export interface SessionUser {
+  _id: string;
+  name: string;
+  mobile: string;
+  email?: string;
+  role: "user" | "manager" | "admin";
+  venueId?: string;
+  whatsappUpdates: boolean;
+  offers: boolean;
 }
-function getSession() {
-  try {
-    return localStorage.getItem(storageKey) === "signed-in";
-  } catch {
-    return memorySession;
-  }
-}
-function writeSession(signedIn: boolean) {
-  memorySession = signedIn;
-  try {
-    if (signedIn) localStorage.setItem(storageKey, "signed-in");
-    else localStorage.removeItem(storageKey);
-  } catch {
-    /* Browser storage may be unavailable; retain this tab's session. */
-  }
-  listeners.forEach((listener) => listener());
-}
-const SessionContext = createContext<{
-  signedIn: boolean | null;
+
+interface SessionContextType {
+  user: SessionUser | null;
+  signedIn: boolean;
+  loading: boolean;
+  refreshSession: () => Promise<SessionUser | null>;
+  completeLogin: () => Promise<void>;
+  // Kept as an alias for completeLogin for compatibility
   completePreviewLogin: () => void;
-  logout: () => void;
-} | null>(null);
+  logout: () => Promise<void>;
+}
+
+const SessionContext = createContext<SessionContextType | null>(null);
+
+const AUTH_PAGES = ["/login", "/signup", "/otp"];
+const PROTECTED_PAGES = ["/home"];
 
 export function SessionNavigation({ children }: { children: ReactNode }) {
-  const signedIn = useSyncExternalStore(subscribe, getSession, () => null);
+  const [user, setUser] = useState<SessionUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
-  const continueAfterLogin = useRef(false);
-  const authPage = ["/login", "/signup", "/otp"].includes(pathname);
 
-  useEffect(() => {
-    if (signedIn && pathname === "/" && continueAfterLogin.current) {
-      continueAfterLogin.current = false;
-      router.push("/home");
-    } else if (signedIn && authPage) {
-      router.replace("/");
+  const refreshSession = useCallback(async (): Promise<SessionUser | null> => {
+    try {
+      const response = await fetch("/api/auth/me", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        setUser(null);
+        return null;
+      }
+
+      const data = await response.json();
+      if (data.success && data.user) {
+        setUser(data.user);
+        return data.user;
+      }
+
+      setUser(null);
+      return null;
+    } catch {
+      setUser(null);
+      return null;
+    } finally {
+      setLoading(false);
     }
-  }, [signedIn, pathname, authPage, router]);
+  }, []);
 
-  function completePreviewLogin() {
-    continueAfterLogin.current = true;
-    writeSession(true);
-    // All auth steps replace the same entry. Restore it to the landing before
-    // pushing Home, giving Back a safe destination even for direct OTP visits.
-    router.replace("/");
+  // Fetch session on initial mount
+  useEffect(() => {
+    refreshSession();
+  }, [refreshSession]);
+
+  // Route protection
+  useEffect(() => {
+    if (loading) return;
+
+    const isAuthPage = AUTH_PAGES.includes(pathname);
+    const isProtectedPage = PROTECTED_PAGES.some((prefix) =>
+      pathname.startsWith(prefix),
+    );
+
+    // If authenticated and visiting an auth page (login/signup/otp), redirect to home
+    if (user && isAuthPage) {
+      router.replace("/home");
+    }
+
+    // If unauthenticated and visiting a protected page (e.g. /home), redirect to login
+    if (!user && isProtectedPage) {
+      router.replace("/login");
+    }
+  }, [user, loading, pathname, router]);
+
+  async function completeLogin() {
+    await refreshSession();
+    router.replace("/home");
   }
 
-  function logout() {
-    continueAfterLogin.current = false;
-    writeSession(false);
-    router.replace("/");
+  function completePreviewLogin() {
+    void completeLogin();
+  }
+
+  async function logout() {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error("Logout request error:", error);
+    } finally {
+      setUser(null);
+      router.replace("/");
+    }
+  }
+
+  const isAuthPage = AUTH_PAGES.includes(pathname);
+  const isProtectedPage = PROTECTED_PAGES.some((prefix) =>
+    pathname.startsWith(prefix),
+  );
+
+  // Avoid flash of content while checking initial session on protected or auth routes
+  if (loading && (isAuthPage || isProtectedPage)) {
+    return (
+      <div className="flex min-h-svh items-center justify-center bg-white font-sans text-sm text-neutral-500">
+        Loading...
+      </div>
+    );
   }
 
   return (
-    <SessionContext.Provider value={{ signedIn, completePreviewLogin, logout }}>
-      {signedIn === null || (signedIn && authPage) ? null : children}
+    <SessionContext.Provider
+      value={{
+        user,
+        signedIn: Boolean(user),
+        loading,
+        refreshSession,
+        completeLogin,
+        completePreviewLogin,
+        logout,
+      }}
+    >
+      {children}
     </SessionContext.Provider>
   );
 }
 
+export function useSession() {
+  const context = useContext(SessionContext);
+  if (!context) {
+    throw new Error("useSession must be used within a SessionNavigation provider");
+  }
+  return context;
+}
+
+// Retained for backward compatibility with existing components
 export function usePreviewSession() {
-  const session = useContext(SessionContext);
-  if (!session) throw new Error("Session navigation provider is missing");
-  return session;
+  return useSession();
 }

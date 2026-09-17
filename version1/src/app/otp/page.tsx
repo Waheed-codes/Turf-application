@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import OtpForm from "./otp-form";
 
@@ -42,7 +43,9 @@ export default async function OtpPage({
         <h1 className="mt-10 text-center text-[clamp(1.5rem,6.5vw,1.875rem)] leading-tight font-semibold tracking-tight">
           Verify your number
         </h1>
-        <OtpForm />
+        <Suspense fallback={<div className="mt-8 text-center text-sm text-neutral-400">Loading form...</div>}>
+          <OtpForm />
+        </Suspense>
       </div>
     </main>
   );
