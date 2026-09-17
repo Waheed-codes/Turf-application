@@ -22,6 +22,12 @@ export default function OtpForm() {
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
   const complete = digits.every((digit) => /^[0-9]$/.test(digit));
 
+  useEffect(() => {
+    if (complete) {
+      completePreviewLogin();
+    }
+  }, [complete, completePreviewLogin]);
+
   function fillCode(code: string) {
     if (!/^[0-9]{4}$/.test(code)) return;
     setDigits(code.split(""));
@@ -130,7 +136,7 @@ export default function OtpForm() {
 
       <form className="mt-10" onSubmit={handleVerify}>
         <fieldset>
-          <legend className="mb-7 w-full">
+          <legend className="mb-5 w-full">
             <span className="flex items-center gap-4 text-xs font-semibold tracking-[0.2em] text-neutral-500">
               <span aria-hidden="true" className="h-px flex-1 bg-neutral-200" />
               ENTER OTP

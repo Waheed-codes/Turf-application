@@ -11,7 +11,7 @@ export default async function OtpPage({
   const backPath = source === "signup" ? "/signup" : "/login";
   const backLabel = source === "signup" ? "Back to signup" : "Back to login";
   return (
-    <main className="min-h-svh bg-white px-6 py-8 font-sans text-neutral-950 sm:py-16">
+    <main className="min-h-svh bg-white px-6 pt-4 pb-8 font-sans text-neutral-950 sm:py-12">
       <div className="mx-auto w-full max-w-sm">
         <Link
           href={backPath}
@@ -36,11 +36,11 @@ export default async function OtpPage({
         </Link>
         <div
           aria-label="Logo placeholder"
-          className="mt-8 flex min-h-10 items-center justify-center px-4 text-xs font-semibold tracking-[0.2em]"
+          className="mt-4 flex min-h-8 items-center justify-center px-4 text-xs font-semibold tracking-[0.2em]"
         >
           LOGO
         </div>
-        <h1 className="mt-10 text-center text-[clamp(1.5rem,6.5vw,1.875rem)] leading-tight font-semibold tracking-tight">
+        <h1 className="mt-4 text-center text-[clamp(1.5rem,6.5vw,1.875rem)] leading-tight font-semibold tracking-tight">
           Verify your number
         </h1>
         <Suspense fallback={<div className="mt-8 text-center text-sm text-neutral-400">Loading form...</div>}>
