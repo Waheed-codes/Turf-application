@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode, type SetStateAction } from "react";
+import { createContext, useCallback, useContext, useState, type ReactNode, type SetStateAction } from "react";
 
 export const services = [
   { id: "cricket", label: "Cricket", icon: <><circle cx="16" cy="16" r="12" /><path d="M14 4c-4 8 8 16 4 24" strokeDasharray="2 3" /></> },
@@ -60,7 +60,31 @@ type OnboardingState = {
   playingAreas: PlayingArea[];
   schedulesByResource: Record<string, Schedule>;
 };
+export type BookingSource = "ONLINE" | "OFFLINE";
+export type BookingStatus = "CONFIRMED" | "COMPLETED" | "CANCELLED";
+export type MockBooking = {
+  id: string;
+  resourceId: string;
+  sportId: string;
+  sportName: string;
+  playingAreaName: string;
+  date: string;
+  startMinutes: number;
+  endMinutes: number;
+  bookingType: BookingSource;
+  status: BookingStatus;
+  amount: number | null;
+  customerName?: string;
+  phoneNumber?: string;
+};
+type OfflineBookingInput = Pick<MockBooking, "resourceId" | "date" | "startMinutes" | "endMinutes" | "customerName" | "phoneNumber">;
+type DashboardSelection = { sportId: string; resourceId: string; date: string };
 type OnboardingContext = OnboardingState & {
+  dashboardSelection: DashboardSelection;
+  setDashboardSelection: (update: SetStateAction<DashboardSelection>) => void;
+  mockBookings: MockBooking[];
+  markSlotBooked: (booking: OfflineBookingInput) => void;
+  seedMockBookings: (resourceId: string, date: string, slots: Schedule["slots"]) => void;
   toggleSport: (sport: Sport) => void;
   addCustomSport: (sport: Sport) => void;
   setPlayingAreas: (update: SetStateAction<PlayingArea[]>) => void;
@@ -98,6 +122,36 @@ export function ManagerOnboardingProvider({ children }: { children: ReactNode })
   // Deliberately memory-only. Banking details never enter this state.
   const [state, setState] = useState<OnboardingState>({ selectedSports: [], customSports: [], playingAreas: [], schedulesByResource: {} });
 
+  const [dashboardSelection, setDashboardSelection] = useState<DashboardSelection>({ sportId: "", resourceId: "", date: "" });
+  const [mockState, setMockState] = useState<{ seeded: string[]; bookings: MockBooking[] }>({ seeded: [], bookings: [] });
+  const seedMockBookings = useCallback((resourceId: string, date: string, slots: Schedule["slots"]) => {
+    const area = state.playingAreas.find((area) => area.id === resourceId);
+    if (!area) return;
+    const key = JSON.stringify([resourceId, date]);
+    setMockState((current) => {
+      if (current.seeded.includes(key) || slots.length === 0) return current;
+      const bookings = slots.filter((slot) => slot.enabled).filter((_, index) => index === 0 || index === 4)
+        .map(({ startMinutes, endMinutes }, index): MockBooking => ({
+          id: JSON.stringify(["demo", resourceId, date, startMinutes, endMinutes]),
+          resourceId, sportId: area.sportId, sportName: area.sportLabel, playingAreaName: area.name,
+          date, startMinutes, endMinutes, bookingType: "ONLINE", status: "CONFIRMED",
+          customerName: index === 0 ? "Rahul Sharma" : "Amit Patel", amount: index === 0 ? 1200 : 1500,
+        }));
+      return { seeded: [...current.seeded, key], bookings: [...current.bookings, ...bookings] };
+    });
+  }, [state.playingAreas]);
+
+  function markSlotBooked(booking: OfflineBookingInput) {
+    const slot = state.schedulesByResource[booking.resourceId]?.slots.find((slot) => slot.enabled && slot.startMinutes === booking.startMinutes && slot.endMinutes === booking.endMinutes);
+    const area = state.playingAreas.find((area) => area.id === booking.resourceId);
+    if (!slot || !area) return;
+    const id = crypto.randomUUID();
+    setMockState((current) => {
+      if (current.bookings.some((existing) => existing.status !== "CANCELLED" && existing.resourceId === booking.resourceId && existing.date === booking.date && existing.startMinutes < booking.endMinutes && existing.endMinutes > booking.startMinutes)) return current;
+      return { ...current, bookings: [...current.bookings, { ...booking, id, sportId: area.sportId, sportName: area.sportLabel, playingAreaName: area.name, bookingType: "OFFLINE", status: "CONFIRMED", amount: null, customerName: booking.customerName?.trim() || undefined, phoneNumber: booking.phoneNumber?.trim() || undefined }] };
+    });
+  }
+
   function toggleSport(sport: Sport) {
     setState((current) => current.selectedSports.some((selected) => selected.id === sport.id)
       ? reconcileAreas({ ...current, selectedSports: current.selectedSports.filter((selected) => selected.id !== sport.id) }, current.playingAreas)
@@ -131,7 +185,7 @@ export function ManagerOnboardingProvider({ children }: { children: ReactNode })
     });
   }
 
-  return <ManagerOnboardingContext.Provider value={{ ...state, toggleSport, addCustomSport, setPlayingAreas, updateConfiguration, toggleSlot }}>{children}</ManagerOnboardingContext.Provider>;
+  return <ManagerOnboardingContext.Provider value={{ ...state, dashboardSelection, setDashboardSelection, mockBookings: mockState.bookings, markSlotBooked, seedMockBookings, toggleSport, addCustomSport, setPlayingAreas, updateConfiguration, toggleSlot }}>{children}</ManagerOnboardingContext.Provider>;
 }
 
 export function useManagerOnboarding() {

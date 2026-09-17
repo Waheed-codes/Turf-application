@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DAY_MINUTES, durations, useManagerOnboarding, type PlayingArea } from "@/components/manager/manager-onboarding-provider";
 
 function formatTime(minutes: number): string {
@@ -69,6 +69,10 @@ function TimePicker({ id, label, value, onChange }: { id: string; label: string;
 }
 
 export default function Page() {
+  return <Suspense fallback={<p className="p-6">Loading time slots…</p>}><SlotsPage /></Suspense>;
+}
+
+function SlotsPage() {
   const router = useRouter();
   const { playingAreas } = useManagerOnboarding();
   if (playingAreas.length === 0) return (
@@ -92,8 +96,11 @@ export default function Page() {
 
 function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
   const router = useRouter();
-  const { schedulesByResource, updateConfiguration, toggleSlot } = useManagerOnboarding();
-  const [requestedResourceId, setSelectedResourceId] = useState(resources[0].id);
+  const searchParams = useSearchParams();
+  const editMode = searchParams.get("mode") === "edit";
+  const initialResource = resources.find((resource) => resource.id === searchParams.get("resourceId")) ?? resources[0];
+  const { schedulesByResource, updateConfiguration, toggleSlot, setDashboardSelection } = useManagerOnboarding();
+  const [requestedResourceId, setSelectedResourceId] = useState(initialResource.id);
   const selectedChipRef = useRef<HTMLButtonElement>(null);
   const selectedIndex = Math.max(0, resources.findIndex((resource) => resource.id === requestedResourceId));
   const selectedResource = resources[selectedIndex];
@@ -109,6 +116,11 @@ function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
 
   function saveAndContinue() {
     if (availableCount === 0) return;
+    if (editMode) {
+      setDashboardSelection((current) => ({ ...current, sportId: selectedResource.sportId, resourceId: selectedResourceId }));
+      router.push("/manager/dashboard");
+      return;
+    }
     if (isFinalResource) router.push("/manager/onboarding/banking");
     else setSelectedResourceId(resources[selectedIndex + 1].id);
   }
@@ -117,7 +129,7 @@ function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white font-sans text-neutral-900">
       <header className="border-b border-neutral-200 pt-[env(safe-area-inset-top)]">
         <div className="flex h-[72px] items-center gap-2 px-4">
-          <button type="button" aria-label="Back to Amenities" onClick={() => router.push("/manager/onboarding/amenities")} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
+          <button type="button" aria-label={editMode ? "Back to Dashboard" : "Back to Amenities"} onClick={() => router.push(editMode ? "/manager/dashboard" : "/manager/onboarding/amenities")} className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m14 6-6 6 6 6M8 12h12" /></svg>
           </button>
           <p className="text-lg font-semibold">Set Time Slots</p>
@@ -193,7 +205,7 @@ function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
 
       <footer className="sticky bottom-0 border-t border-neutral-100 bg-white px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <button type="button" disabled={availableCount === 0} onClick={saveAndContinue} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors">
-          {isFinalResource ? "Save & Continue" : "Save & Next Court"}
+          {editMode ? "Save Changes" : isFinalResource ? "Save & Continue" : "Save & Next Court"}
         </button>
       </footer>
     </div>
