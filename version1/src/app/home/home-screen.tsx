@@ -1,5 +1,6 @@
 "use client";
 
+import DateSelector from "@/components/booking/date-selector";
 import CustomerNavigation from "@/components/navigation/customer-navigation";
 import { useEffect, useState } from "react";
 import {
@@ -132,6 +133,9 @@ export default function HomeScreen() {
             </div>
           </fieldset>
 
+ V1-login-home
+          <DateSelector dates={dates} date={date} onChange={setDate} />
+
           <fieldset className="mt-5 min-w-0">
             <legend className="text-sm font-semibold tracking-tight">
               Select date
@@ -167,6 +171,7 @@ export default function HomeScreen() {
               ))}
             </div>
           </fieldset>
+ main
 
           <fieldset className="mt-5 min-w-0">
             <legend className="text-sm font-semibold tracking-tight">
