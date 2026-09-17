@@ -58,7 +58,7 @@ export default function HomeScreen() {
   const displaySports = [{ id: "all", name: "All" }, ...sports];
 
   return (
-    <main className="min-h-svh bg-neutral-50 px-6 pt-8 pb-[calc(8rem+env(safe-area-inset-bottom))] font-sans text-neutral-950">
+    <main className="min-h-svh bg-neutral-50 px-6 pt-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))] font-sans text-neutral-950">
       <div className="mx-auto w-full max-w-sm">
         <h1 className="sr-only">Find a sports venue</h1>
         <header className="flex items-center justify-between">
@@ -77,16 +77,14 @@ export default function HomeScreen() {
             onClick={() =>
               setNotice("Profile will be available in a future update.")
             }
-            className={`flex size-11 items-center justify-center rounded-full border border-neutral-200 bg-neutral-200 text-neutral-600 ${focus}`}
+            className={`flex size-10 items-center justify-center rounded-full border border-neutral-200 bg-neutral-200 text-neutral-600 ${focus}`}
           >
-            <HomeIcon name="profile" className="size-6" />
+            <HomeIcon name="profile" className="size-5" />
           </button>
         </header>
 
-
-
         <form
-          className="mt-6"
+          className="mt-4"
           onSubmit={(event) => {
             event.preventDefault();
             if (!startTime || !endTime) {
@@ -101,7 +99,7 @@ export default function HomeScreen() {
             }
           }}
         >
-          <label className="flex min-h-12 items-center gap-3 rounded-full bg-white px-4 shadow-sm">
+          <label className="flex min-h-11 items-center gap-3 rounded-full bg-white px-4 shadow-sm">
             <HomeIcon
               name="search"
               className="size-5 shrink-0 text-neutral-400"
@@ -112,22 +110,22 @@ export default function HomeScreen() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search venues, areas, or locations"
-              className="min-h-12 w-full min-w-0 bg-transparent text-sm placeholder:text-neutral-400 focus:outline-none"
+              className="min-h-11 w-full min-w-0 bg-transparent text-sm placeholder:text-neutral-400 focus:outline-none"
             />
           </label>
 
-          <fieldset className="mt-8 min-w-0">
-            <legend className="text-base font-semibold tracking-tight">
+          <fieldset className="mt-5 min-w-0">
+            <legend className="text-sm font-semibold tracking-tight">
               Select Sport
             </legend>
-            <div className="mt-5 flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="mt-2.5 flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {displaySports.map((option) => (
                 <button
                   key={option.id}
                   type="button"
                   aria-pressed={sport === option.id}
                   onClick={() => setSport(option.id)}
-                  className={`shrink-0 min-h-11 min-w-[72px] rounded-full border px-5 py-2 text-xs font-semibold sm:text-sm ${focus} ${sport === option.id ? "border-neutral-950 bg-neutral-950 text-white" : "border-neutral-200 bg-white"}`}
+                  className={`shrink-0 min-h-10 min-w-[68px] rounded-full border px-4 py-1.5 text-xs font-semibold sm:text-sm ${focus} ${sport === option.id ? "border-neutral-950 bg-neutral-950 text-white" : "border-neutral-200 bg-white"}`}
                 >
                   {option.name}
                 </button>
@@ -135,13 +133,51 @@ export default function HomeScreen() {
             </div>
           </fieldset>
 
+ V1-login-home
           <DateSelector dates={dates} date={date} onChange={setDate} />
 
-          <fieldset className="mt-8 min-w-0">
-            <legend className="text-base font-semibold tracking-tight">
+          <fieldset className="mt-5 min-w-0">
+            <legend className="text-sm font-semibold tracking-tight">
+              Select date
+            </legend>
+            <div className="mt-2.5 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              {dates.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-label={option.label}
+                  aria-pressed={date === option.id}
+                  onClick={() => setDate(option.id)}
+                  className={`relative flex h-[76px] w-[48px] shrink-0 flex-col items-center justify-center rounded-full ${date === option.id ? "bg-neutral-950 text-white" : "text-neutral-800"}`}
+                >
+                  <span
+                    className={`text-[0.615rem] font-medium ${date === option.id ? "text-neutral-300" : "text-neutral-500"}`}
+                  >
+                    {option.weekday}
+                  </span>
+                  <span className="text-[1.3rem] leading-[1.1] font-medium">
+                    {option.day}
+                  </span>
+                  <span
+                    className={`text-[0.75rem] font-medium ${date === option.id ? "text-neutral-300" : "text-neutral-500"}`}
+                  >
+                    {option.month}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className={`absolute bottom-[5px] size-1 rounded-full ${date === option.id ? "bg-white" : "bg-transparent"}`}
+                  />
+                </button>
+              ))}
+            </div>
+          </fieldset>
+ main
+
+          <fieldset className="mt-5 min-w-0">
+            <legend className="text-sm font-semibold tracking-tight">
               Select time
             </legend>
-            <div className="mt-4 flex items-center gap-3">
+            <div className="mt-2.5 flex items-center gap-3">
               {(["start", "end"] as const).map((kind, index) => (
                 <div key={kind} className="contents">
                   {index === 1 && (
@@ -168,14 +204,16 @@ export default function HomeScreen() {
                         }
                         setNotice("");
                       }}
-                      className={`min-h-14 w-full appearance-none rounded-full border border-neutral-500 bg-white py-3 px-4 text-left text-sm font-semibold`}
+                      className={`min-h-12 w-full appearance-none rounded-full border ${(kind === "start" ? startTime : endTime) ? "border-neutral-950" : "border-neutral-300"} bg-white py-2.5 px-4 text-left text-sm font-semibold focus:border-neutral-950 focus:outline-none focus:ring-1 focus:ring-neutral-950 transition-colors`}
                     >
                       <option value="" disabled hidden>
                         0:00
                       </option>
                       {(kind === "end" && startTime
                         ? timeOptions.filter((opt) => opt.value > startTime)
-                        : timeOptions
+                        : kind === "start"
+                          ? timeOptions.slice(0, -1)
+                          : timeOptions
                       ).map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -192,23 +230,23 @@ export default function HomeScreen() {
             </div>
           </fieldset>
 
-          <p className="mt-7 text-center text-xs leading-5 text-neutral-500 italic">
+          <p className="mt-4 text-center text-xs leading-4 text-neutral-500 italic">
             Select a sport, date and time to see available venues.
           </p>
           <button
             type="submit"
-            className={`mt-3 flex min-h-14 w-full items-center justify-center rounded-full bg-neutral-950 px-4 py-4 text-sm font-semibold text-white shadow-md hover:bg-neutral-800 ${focus}`}
+            className={`mt-2.5 flex min-h-12 w-full items-center justify-center rounded-full bg-neutral-950 px-4 py-3 text-sm font-semibold text-white shadow-md hover:bg-neutral-800 ${focus}`}
           >
             Find Available Venues
           </button>
         </form>
         <p
           role="status"
-          className="mt-3 text-center text-sm leading-5 text-neutral-600"
+          className="mt-2 text-center text-sm leading-5 text-neutral-600"
         >
           {notice}
         </p>
-        <p className="mt-2 text-center text-[0.625rem] text-neutral-500">
+        <p className="mt-1 text-center text-[0.625rem] text-neutral-500">
           Preview · sample game and dates · no real bookings
         </p>
       </div>
