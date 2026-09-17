@@ -3,6 +3,7 @@
 import DateSelector from "@/components/booking/date-selector";
 import CustomerNavigation from "@/components/navigation/customer-navigation";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   generateUpcomingDates,
   mockLocation,
@@ -40,6 +41,7 @@ function UpcomingGameBar({ game }: { game: UpcomingGame }) {
 }
 
 export default function HomeScreen({ initialContext, initialQuery = "" }: { initialContext?: AvailabilityContext | null; initialQuery?: string }) {
+  const router = useRouter();
   const [submitted, setSubmitted] = useState<AvailabilityContext | null>(null);
   const [query, setQuery] = useState(initialQuery);
   const [sport, setSport] = useState(initialContext?.sport === "Box Cricket" ? "cricket" : initialContext?.sport.toLowerCase() ?? "all");
@@ -75,7 +77,7 @@ export default function HomeScreen({ initialContext, initialQuery = "" }: { init
             aria-label="Profile"
             title="Profile"
             onClick={() =>
-              setNotice("Profile will be available in a future update.")
+              router.push("/profile")
             }
             className={`flex size-10 items-center justify-center rounded-full border border-neutral-200 bg-neutral-200 text-neutral-600 ${focus}`}
           >
