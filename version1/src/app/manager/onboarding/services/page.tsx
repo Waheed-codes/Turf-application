@@ -1,12 +1,16 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import { useSetupEdit } from "@/components/manager/use-setup-edit";
 import { useRouter } from "next/navigation";
+import { ManagerDialog } from "@/components/manager/manager-dialog";
 import { services, customSportIcon, useManagerOnboarding } from "@/components/manager/manager-onboarding-provider";
 
 export default function Page() {
   const router = useRouter();
-  const { selectedSports, customSports, toggleSport, addCustomSport } = useManagerOnboarding();
+  const { settingsEdit, destination } = useSetupEdit();
+  const { selectedSports, customSports, toggleSport, addCustomSport, playingAreas, schedulesByResource, mockBookings } = useManagerOnboarding();
+  const [removing, setRemoving] = useState<{ id: string; label: string } | null>(null);
   const selectedIds = selectedSports.map((sport) => sport.id);
   const [sportName, setSportName] = useState("");
   const [error, setError] = useState("");
@@ -35,7 +39,7 @@ export default function Page() {
           <button
             type="button"
             aria-label="Go back"
-            onClick={() => { if (window.history.length > 1) router.back(); }}
+            onClick={() => { if (settingsEdit) router.push("/manager/settings"); else if (window.history.length > 1) router.back(); }}
             className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -60,7 +64,12 @@ export default function Page() {
                 key={service.id}
                 type="button"
                 aria-pressed={selected}
-                onClick={() => toggleSport({ id: service.id, label: service.label })}
+                onClick={() => {
+                  const sport = { id: service.id, label: service.label };
+                  const dependentAreas = playingAreas.filter((area) => area.sportId === sport.id);
+                  if (selected && (dependentAreas.length || dependentAreas.some((area) => schedulesByResource[area.id]) || mockBookings.some((booking) => booking.sportId === sport.id))) setRemoving(sport);
+                  else toggleSport(sport);
+                }}
                 className={`relative flex h-[120px] min-w-0 flex-col items-center justify-center gap-3 rounded-2xl border px-2 text-sm font-semibold motion-safe:transition-[background-color,border-color,box-shadow] motion-safe:duration-150 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 ${selected
                   ? "border-neutral-900 bg-neutral-900 text-white shadow-md"
                   : "border-neutral-200 bg-white text-neutral-600 shadow-sm hover:border-neutral-400"}`}
@@ -100,13 +109,17 @@ export default function Page() {
         <button
           type="button"
           disabled={selectedIds.length === 0}
-          onClick={() => { if (selectedIds.length > 0) router.push("/manager/onboarding/courts"); }}
+          onClick={() => { if (selectedIds.length > 0) router.push(destination("/manager/onboarding/courts")); }}
           className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors"
         >
-          Save &amp; Continue
+          {settingsEdit ? "Save Changes" : "Save & Continue"}
         </button>
       </footer>
 
+      {removing && <ManagerDialog title={`Remove ${removing.label}?`} onDismiss={() => setRemoving(null)}>
+        <p className="mt-4 text-sm leading-6 text-neutral-600">{removing.label} has {playingAreas.filter((area) => area.sportId === removing.id).length} playing areas configured. Removing it deletes those playing areas and their schedules. Existing bookings remain in booking history. Adding this sport again creates new playing areas.</p>
+        <div className="mt-6 grid grid-cols-2 gap-3"><button type="button" onClick={() => setRemoving(null)} className="min-h-12 rounded-xl border border-neutral-200 focus-visible:outline-2">Cancel</button><button type="button" onClick={() => { toggleSport(removing); setRemoving(null); }} className="min-h-12 rounded-xl bg-neutral-900 text-white focus-visible:outline-2">Remove</button></div>
+      </ManagerDialog>}
       <dialog
         ref={dialogRef}
         aria-labelledby="add-sport-title"

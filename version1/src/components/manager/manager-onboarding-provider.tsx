@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState, type ReactNode, type SetStateAction } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode, type SetStateAction } from "react";
 
 export const services = [
   { id: "cricket", label: "Cricket", icon: <><circle cx="16" cy="16" r="12" /><path d="M14 4c-4 8 8 16 4 24" strokeDasharray="2 3" /></> },
@@ -54,6 +54,9 @@ export const terminology: Record<ResourceType, { name: string; label: string }> 
   pool: { name: "Pool", label: "POOL" }, area: { name: "Area", label: "AREA" },
 };
 
+export type VenuePhoto = { id: string; name: string; previewUrl: string };
+type Amenity = { id: string; label: string; icon: ReactNode };
+
 type OnboardingState = {
   selectedSports: Sport[];
   customSports: Sport[];
@@ -80,6 +83,22 @@ export type MockBooking = {
 type OfflineBookingInput = Pick<MockBooking, "resourceId" | "date" | "startMinutes" | "endMinutes" | "customerName" | "phoneNumber">;
 type DashboardSelection = { sportId: string; resourceId: string; date: string };
 type OnboardingContext = OnboardingState & {
+  mapsUrl: string;
+  setMapsUrl: (update: SetStateAction<string>) => void;
+  selectedArea: string;
+  setSelectedArea: (update: SetStateAction<string>) => void;
+  mockDetected: boolean;
+  setMockDetected: (update: SetStateAction<boolean>) => void;
+  description: string;
+  setDescription: (update: SetStateAction<string>) => void;
+  photos: VenuePhoto[];
+  setPhotos: (update: SetStateAction<VenuePhoto[]>) => void;
+  selectedAmenityIds: string[];
+  setSelectedAmenityIds: (update: SetStateAction<string[]>) => void;
+  customAmenities: Amenity[];
+  setCustomAmenities: (update: SetStateAction<Amenity[]>) => void;
+  notificationPreferences: Record<string, boolean>;
+  setNotificationPreferences: (update: SetStateAction<Record<string, boolean>>) => void;
   dashboardSelection: DashboardSelection;
   setDashboardSelection: (update: SetStateAction<DashboardSelection>) => void;
   mockBookings: MockBooking[];
@@ -112,7 +131,7 @@ function reconcileAreas(state: OnboardingState, areas: PlayingArea[]): Onboardin
 function selectSport(state: OnboardingState, sport: Sport): OnboardingState {
   const resourceType = resourceTypes[sport.id] ?? "area";
   const area: PlayingArea = {
-    id: `${sport.id}-resource-1`, sportId: sport.id, sportLabel: sport.label,
+    id: `${sport.id}-resource-${crypto.randomUUID()}`, sportId: sport.id, sportLabel: sport.label,
     resourceType, name: `${terminology[resourceType].name} 1`,
   };
   return reconcileAreas({ ...state, selectedSports: [...state.selectedSports, sport] }, [...state.playingAreas, area]);
@@ -121,6 +140,22 @@ function selectSport(state: OnboardingState, sport: Sport): OnboardingState {
 export function ManagerOnboardingProvider({ children }: { children: ReactNode }) {
   // Deliberately memory-only. Banking details never enter this state.
   const [state, setState] = useState<OnboardingState>({ selectedSports: [], customSports: [], playingAreas: [], schedulesByResource: {} });
+
+  const [mapsUrl, setMapsUrl] = useState<string>("");
+  const [selectedArea, setSelectedArea] = useState<string>("");
+  const [mockDetected, setMockDetected] = useState<boolean>(false);
+  const [description, setDescription] = useState<string>("");
+  const [photos, setPhotos] = useState<VenuePhoto[]>([]);
+  const [selectedAmenityIds, setSelectedAmenityIds] = useState<string[]>(["washroom", "water", "floodlights"]);
+  const [customAmenities, setCustomAmenities] = useState<Amenity[]>([]);
+  const [notificationPreferences, setNotificationPreferences] = useState<Record<string, boolean>>({ Booking: true, Cancellation: true, Payment: true });
+  const photoUrls = useRef(new Set<string>());
+  useEffect(() => {
+    const currentUrls = new Set(photos.map((photo) => photo.previewUrl));
+    photoUrls.current.forEach((url) => { if (!currentUrls.has(url)) URL.revokeObjectURL(url); });
+    photoUrls.current = currentUrls;
+  }, [photos]);
+  useEffect(() => () => { photoUrls.current.forEach((url) => URL.revokeObjectURL(url)); }, []);
 
   const [dashboardSelection, setDashboardSelection] = useState<DashboardSelection>({ sportId: "", resourceId: "", date: "" });
   const [mockState, setMockState] = useState<{ seeded: string[]; bookings: MockBooking[] }>({ seeded: [], bookings: [] });
@@ -185,7 +220,7 @@ export function ManagerOnboardingProvider({ children }: { children: ReactNode })
     });
   }
 
-  return <ManagerOnboardingContext.Provider value={{ ...state, dashboardSelection, setDashboardSelection, mockBookings: mockState.bookings, markSlotBooked, seedMockBookings, toggleSport, addCustomSport, setPlayingAreas, updateConfiguration, toggleSlot }}>{children}</ManagerOnboardingContext.Provider>;
+  return <ManagerOnboardingContext.Provider value={{ ...state, mapsUrl, setMapsUrl, selectedArea, setSelectedArea, mockDetected, setMockDetected, description, setDescription, photos, setPhotos, selectedAmenityIds, setSelectedAmenityIds, customAmenities, setCustomAmenities, notificationPreferences, setNotificationPreferences, dashboardSelection, setDashboardSelection, mockBookings: mockState.bookings.map((booking) => { const area = state.playingAreas.find((area) => area.id === booking.resourceId); return area ? { ...booking, playingAreaName: area.name, sportName: area.sportLabel } : booking; }), markSlotBooked, seedMockBookings, toggleSport, addCustomSport, setPlayingAreas, updateConfiguration, toggleSlot }}>{children}</ManagerOnboardingContext.Provider>;
 }
 
 export function useManagerOnboarding() {
