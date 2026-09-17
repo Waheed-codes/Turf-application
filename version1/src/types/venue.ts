@@ -12,6 +12,7 @@ export type Venue = {
   image: string;
   imageDescription: string;
   sports: VenueSport[];
+  sportConfigurations?: Partial<Record<VenueSport, SportConfiguration>>;
   amenities: string[];
   description: string;
   dimensions: string;
@@ -20,3 +21,5 @@ export type Venue = {
   courts?: number;
   address: string;
 };
+
+export type SportConfiguration = { dimensions: string; surface: string; count: number; countLabel: "Courts" | "Turfs" | "Grounds"; hourlyPrice: number; blockedHours: number[]; priceByHour: Record<number, number> };

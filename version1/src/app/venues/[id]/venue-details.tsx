@@ -6,7 +6,7 @@ import { useState } from "react";
 import HomeIcon from "@/app/home/home-icon";
 import { useFavorites } from "@/hooks/use-favorites";
 import { type BookingContext } from "@/lib/booking-context";
-import BookingSelection, { BookingCta, BookingSummary, PriceDetails } from "./booking-selection";
+import BookingSelection, { BookingCta, BookingSummary, PriceDetails, SportDetails } from "./booking-selection";
 import type { Venue } from "@/types/venue";
 
 const action = "flex size-11 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-950 shadow-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black";
@@ -71,23 +71,17 @@ export default function VenueDetails({ venue, bookingContext, initialDate }: { v
             <span aria-label={`Rating ${venue.rating} out of 5`} className="shrink-0 rounded-md bg-neutral-100 px-2 py-1 text-xs font-semibold">★ {venue.rating.toFixed(1)}</span>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-500"><HomeIcon name="location" className="size-4" /><span>{venue.area}, {venue.city}</span><span className="rounded bg-neutral-100 px-2 py-1 text-[0.625rem] font-semibold text-neutral-700 uppercase">{venue.sport}</span></div>
-          <dl className="mt-7 grid grid-cols-2 gap-x-4 gap-y-4 text-sm">
-            {[["Dimensions", venue.dimensions], ["Surface", venue.surface], ["Type", venue.setting], ...(venue.courts ? [["Courts", String(venue.courts)]] : [])].map(([label, value]) => <div key={label}><dt className="text-xs text-neutral-500">{label}</dt><dd className="mt-1 font-medium">{value}</dd></div>)}
-          </dl>
-          {preselected && <section className="mt-7" aria-labelledby="available-sports"><h2 id="available-sports" className="text-xs font-semibold tracking-widest text-neutral-500">AVAILABLE SPORTS</h2><ul className="mt-4 flex flex-wrap gap-4">{venue.sports.map((sport) => <li key={sport} className="flex flex-col items-center gap-2"><span className="flex size-11 items-center justify-center rounded-full bg-neutral-100"><HomeIcon name="ball" /></span><span className="text-[0.625rem] font-semibold uppercase">{sport}</span></li>)}</ul></section>}
+          {preselected && selection ? <><section className="mt-7"><h2 className="text-base font-semibold">Available Sports</h2><p className="mt-3 text-sm font-semibold">{selection.sport}</p></section><SportDetails venue={venue} sport={selection.sport} /></> : <BookingSelection venue={venue} initialDate={initialDate} context={selection} onChange={setSelection} />}
+          {selection && <BookingSummary venue={venue} context={selection} />}
+          {selection && <PriceDetails venue={venue} context={selection} />}
           <section className="mt-7" aria-labelledby="amenities"><h2 id="amenities" className="text-xs font-semibold tracking-widest text-neutral-500">AMENITIES</h2><ul className="mt-3 flex flex-wrap gap-2">{venue.amenities.map((amenity) => <li key={amenity} className="rounded-full border border-neutral-100 bg-neutral-50 px-3 py-2 text-xs text-neutral-600"><span aria-hidden="true" className="mr-1">✓</span>{amenity}</li>)}</ul></section>
           <p className="mt-6 text-sm leading-6 text-neutral-500">{venue.description}</p>
-          {!preselected && <BookingSelection venue={venue} initialDate={initialDate} context={selection} onChange={setSelection} />}
-          {selection && <BookingSummary context={selection} />}
-          {selection && <PriceDetails venue={venue} context={selection} />}
-          <MapPreview address={venue.address} />
-          <div className="mt-6 flex items-end justify-between gap-4 border-t border-neutral-100 pt-5"><span className="text-sm text-neutral-500">Starting from</span><p className="text-xl font-semibold">₹{venue.startingPricePerHour.toLocaleString("en-IN")}<span className="text-sm font-normal text-neutral-500">/hr</span></p></div>
-          <p className="mt-3 text-xs leading-5 text-neutral-500">{selection ? "Sample venue information and pricing. No booking has been made." : "Sample venue information and pricing. Choose a sport, date and slot to continue."}</p>
           <p role="status" className="mt-3 text-sm leading-5 text-neutral-600">{message}</p>
           {shareUrl && <label className="mt-3 block text-sm">Venue link<input readOnly value={shareUrl} onFocus={(event) => event.currentTarget.select()} className="mt-2 w-full min-w-0 rounded-lg border border-neutral-300 p-2 focus-visible:outline-2" /></label>}
+          <MapPreview address={venue.address} />
         </article>
       </div>
-      <BookingCta venue={venue} context={selection} preselected={preselected} />
+      <BookingCta venue={venue} context={selection} />
     </main>
   );
 }

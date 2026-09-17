@@ -11,9 +11,9 @@ export const sports: Sport[] = [
   { id: "table-tennis", name: "Table Tennis" },
 ];
 
-export function generateUpcomingDates(days: number = 7): HomeDate[] {
+export function generateUpcomingDates(days: number = 7, startDate?: string): HomeDate[] {
   const upcomingDates: HomeDate[] = [];
-  const now = new Date();
+  const now = startDate ? new Date(`${startDate}T12:00:00Z`) : new Date();
   
   for (let i = 0; i < days; i++) {
     const d = new Date(now);
