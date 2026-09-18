@@ -97,13 +97,30 @@ export async function POST(request: Request) {
     const isValid = verifyOtp(otp, verification.otpHash);
 
     if (!isValid) {
-      verification.attempts += 1;
-      await verification.save();
+      const updated = await OtpVerification.findByIdAndUpdate(
+        verification._id,
+        { $inc: { attempts: 1 } },
+        { new: true },
+      );
+
+      const attempts = updated?.attempts ?? (verification.attempts + 1);
+      const remainingAttempts = Math.max(0, 5 - attempts);
+
+      if (attempts >= 5) {
+        await OtpVerification.deleteOne({ _id: verification._id });
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Too many incorrect attempts. Please request a new OTP.",
+          },
+          { status: 429 },
+        );
+      }
 
       return NextResponse.json(
         {
           success: false,
-          message: "Incorrect OTP",
+          message: `Incorrect OTP. ${remainingAttempts} attempt${remainingAttempts === 1 ? "" : "s"} remaining.`,
         },
         { status: 400 },
       );
@@ -140,15 +157,31 @@ export async function POST(request: Request) {
         );
       }
 
-      const user = await User.create({
-        name: verification.signupData.name,
-        mobile: verification.mobile,
-        email: verification.signupData.email,
-        referralCode: verification.signupData.referralCode,
-        role: "user",
-        whatsappUpdates: verification.signupData.whatsappUpdates,
-        offers: verification.signupData.offers,
-      });
+      let user;
+      try {
+        user = await User.create({
+          name: verification.signupData.name,
+          mobile: verification.mobile,
+          email: verification.signupData.email,
+          referralCode: verification.signupData.referralCode,
+          role: "user",
+          whatsappUpdates: verification.signupData.whatsappUpdates,
+          offers: verification.signupData.offers,
+        });
+      } catch (err: unknown) {
+        const mongoError = err as { code?: number };
+        if (mongoError?.code === 11000) {
+          await OtpVerification.deleteOne({ _id: verification._id });
+          return NextResponse.json(
+            {
+              success: false,
+              message: "An account already exists with this mobile number.",
+            },
+            { status: 409 },
+          );
+        }
+        throw err;
+      }
 
       // OTP can no longer be reused
       await OtpVerification.deleteOne({

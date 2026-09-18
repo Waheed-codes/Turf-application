@@ -1,3 +1,4 @@
+
 export interface SendOtpResult {
   success: boolean;
   message?: string;
@@ -18,13 +19,18 @@ export async function sendOtpSms(
   otp: string,
 ): Promise<SendOtpResult> {
   const apiKey = process.env.SMS_API_KEY;
+  const smsEnabled = process.env.SMS_ENABLED === "true";
 
   // Extract pure 10-digit Indian number for SMS gateways (stripping 91 or +91)
   const tenDigit = mobile.replace(/\D/g, "").slice(-10);
 
-  // 1. Fallback mode: If no API key is configured, log to terminal
-  if (!apiKey) {
-    console.log(`[DEV OTP] ${mobile} (10-digit: ${tenDigit}): ${otp}`);
+  // Always print OTP in terminal for easy, instant verification in development
+  console.log(`\n========================================`);
+  console.log(`[DEV OTP] Mobile: ${mobile} | Code: ${otp}`);
+  console.log(`========================================\n`);
+
+  // 1. Terminal / Dev mode (default): if SMS_ENABLED is not explicitly "true" or no key
+  if (!smsEnabled || !apiKey) {
     return {
       success: true,
       mode: "dev_log",

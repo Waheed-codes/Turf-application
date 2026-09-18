@@ -72,6 +72,29 @@ export async function POST(request: Request) {
       );
     }
 
+    // Rate Limiting: enforce 60-second cooldown between OTP requests for the same number
+    const recentOtp = await OtpVerification.findOne({
+      mobile: normalizedMobile,
+      purpose,
+    }).sort({ createdAt: -1 });
+
+    if (recentOtp) {
+      const secondsPassed = Math.floor(
+        (Date.now() - new Date(recentOtp.createdAt).getTime()) / 1000,
+      );
+      const COOLDOWN_SECONDS = 60;
+      if (secondsPassed < COOLDOWN_SECONDS) {
+        const waitTime = COOLDOWN_SECONDS - secondsPassed;
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Please wait ${waitTime} seconds before requesting another OTP.`,
+          },
+          { status: 429 },
+        );
+      }
+    }
+
     // Generate OTP
     const otp = generateOtp();
 

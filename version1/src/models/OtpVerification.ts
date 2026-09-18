@@ -67,7 +67,7 @@ const otpVerificationSchema = new Schema<IOtpVerification>(
     expiresAt: {
       type: Date,
       required: true,
-      index: true,
+      expires: 0, // MongoDB TTL index: automatically deletes document when expiresAt is reached
     },
 
     attempts: {
@@ -79,6 +79,9 @@ const otpVerificationSchema = new Schema<IOtpVerification>(
     timestamps: true,
   },
 );
+
+// Compound index for rapid lookup and atomic updates by mobile & purpose
+otpVerificationSchema.index({ mobile: 1, purpose: 1 });
 
 const OtpVerification: Model<IOtpVerification> =
   mongoose.models.OtpVerification ||

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLoginIdentifier } from "../login-identifier";
 
 const inputClass =
-  "mt-2 min-h-12 w-full min-w-0 rounded-2xl border border-neutral-100 bg-white px-4 py-3 text-base placeholder:text-neutral-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black";
+  "mt-2 min-h-12 w-full min-w-0 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-base placeholder:text-neutral-400 transition-colors focus:border-neutral-900 focus:outline-none";
 const labelClass =
   "block text-[0.6875rem] font-semibold tracking-wider text-neutral-500";
 
@@ -124,7 +124,7 @@ export default function SignupForm() {
           <label htmlFor="signup-mobile" className={labelClass}>
             MOBILE NUMBER
           </label>
-          <div className="mt-2 flex min-h-12 items-center rounded-2xl border border-neutral-100 bg-white px-4 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-black">
+          <div className="mt-2 flex min-h-12 items-center rounded-2xl border border-neutral-200 bg-white px-4 transition-colors focus-within:border-neutral-900">
             <span
               id="signup-country-code"
               className="shrink-0 pr-4 text-sm font-semibold text-neutral-900"
@@ -228,7 +228,7 @@ export default function SignupForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-7 flex min-h-14 w-full items-center justify-center rounded-2xl bg-black px-6 py-4 text-base font-semibold text-white hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+        className="mt-7 flex min-h-14 w-full items-center justify-center rounded-2xl bg-black px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
       >
         {isSubmitting ? "Sending OTP..." : "Sign up"}
       </button>

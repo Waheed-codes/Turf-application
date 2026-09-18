@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "../session-navigation";
 import { useLoginIdentifier } from "../login-identifier";
@@ -22,11 +22,28 @@ export default function OtpForm() {
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
   const complete = digits.every((digit) => /^[0-9]$/.test(digit));
 
+  // Auto-focus the first OTP circle on page load
   useEffect(() => {
-    if (complete) {
-      completePreviewLogin();
+    inputs.current[0]?.focus();
+  }, []);
+
+  // If user starts typing a number when on the OTP screen, route focus to the empty slot
+  useEffect(() => {
+    function handleGlobalKeyDown(event: KeyboardEvent) {
+      if (/^[0-9]$/.test(event.key) && !isVerifying) {
+        const isInputFocused = inputs.current.some(
+          (el) => el === document.activeElement,
+        );
+        if (!isInputFocused) {
+          const emptyIndex = digits.findIndex((d) => !d);
+          const targetIndex = emptyIndex !== -1 ? emptyIndex : 0;
+          inputs.current[targetIndex]?.focus();
+        }
+      }
     }
-  }, [complete, completePreviewLogin]);
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [digits, isVerifying]);
 
   function fillCode(code: string) {
     if (!/^[0-9]{4}$/.test(code)) return;
@@ -144,7 +161,7 @@ export default function OtpForm() {
             </span>
           </legend>
 
-          <div className="mx-auto grid max-w-xs grid-cols-4 gap-3 sm:gap-4">
+          <div className="mx-auto grid max-w-[250px] grid-cols-4 gap-3 sm:gap-4">
             {digits.map((digit, index) => (
               <input
                 key={index}
@@ -155,6 +172,7 @@ export default function OtpForm() {
                 type="text"
                 inputMode="numeric"
                 autoComplete={index === 0 ? "one-time-code" : "off"}
+                autoFocus={index === 0}
                 pattern="[0-9]"
                 maxLength={1}
                 disabled={isVerifying}
@@ -191,7 +209,7 @@ export default function OtpForm() {
                   event.preventDefault();
                   fillCode(event.clipboardData.getData("text").trim());
                 }}
-                className="aspect-square w-full min-w-0 rounded-xl border border-neutral-300 bg-white text-center text-2xl font-semibold text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:bg-neutral-50"
+                className="aspect-square w-full min-w-0 rounded-full border border-neutral-300 bg-white text-center text-xl font-semibold text-neutral-950 transition-colors focus:border-neutral-900 focus:outline-none disabled:bg-neutral-50"
               />
             ))}
           </div>
@@ -203,7 +221,7 @@ export default function OtpForm() {
             type="button"
             disabled={isResending || isVerifying}
             onClick={handleResend}
-            className="min-h-11 font-semibold text-neutral-950 underline underline-offset-4 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4"
+            className="min-h-11 font-semibold text-neutral-950 underline underline-offset-4 disabled:opacity-50 focus:outline-none"
           >
             {isResending ? "Resending..." : "Resend"}
           </button>
@@ -232,7 +250,7 @@ export default function OtpForm() {
         <button
           type="submit"
           disabled={!complete || isVerifying}
-          className="mt-7 flex min-h-14 w-full items-center justify-center rounded-full bg-black px-6 py-4 text-base font-semibold text-white enabled:hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+          className="mx-auto mt-6 flex min-h-11 w-full max-w-[250px] items-center justify-center rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white transition-colors enabled:hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none"
         >
           {isVerifying ? "Verifying..." : "Verify"}
         </button>
