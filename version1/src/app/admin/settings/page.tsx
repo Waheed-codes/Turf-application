@@ -1,5 +1,5 @@
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminSettings } from "@/components/admin/admin-settings";
 
 export default function Page() {
-  return <AdminPageHeader title="Settings" subtitle="Admin settings will be implemented in the next phase." />;
+  return <AdminSettings />;
 }

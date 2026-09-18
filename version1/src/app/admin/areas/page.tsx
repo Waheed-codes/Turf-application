@@ -1,5 +1,5 @@
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminAreas } from "@/components/admin/admin-areas";
 
 export default function Page() {
-  return <AdminPageHeader title="Areas" subtitle="Geographic and service area administration will be implemented in the next phase." />;
+  return <AdminAreas />;
 }

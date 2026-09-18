@@ -59,7 +59,10 @@ export function AdminBookingDetails({ booking, onClose, onAction }: { booking: A
     setNotice(action === "cancel" ? "Booking cancelled in this preview. Payment status is unchanged." : "Payment marked refunded in this preview. No real money was moved.");
     setAction(null);
   }
-  return <dialog ref={dialog} onCancel={event => { if (event.target === event.currentTarget) onClose(); }} onClose={event => { if (event.target === event.currentTarget) onClose(); }} aria-labelledby="booking-details-title" onClick={event => {
+  return <dialog ref={dialog} onCancel={event => { if (event.target === event.currentTarget) onClose(); }} onClose={event => {
+    // Effect replay can reopen the dialog before cleanup's queued close event fires.
+    if (event.target === event.currentTarget && !event.currentTarget.open) onClose();
+  }} aria-labelledby="booking-details-title" onClick={event => {
     if (event.target !== event.currentTarget || action) return;
     const bounds = event.currentTarget.getBoundingClientRect();
     if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
