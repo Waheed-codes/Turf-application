@@ -1,5 +1,5 @@
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminUsers } from "@/components/admin/admin-users";
 
 export default function Page() {
-  return <AdminPageHeader title="Users" subtitle="Customer account administration will be implemented in the next phase." />;
+  return <AdminUsers />;
 }
