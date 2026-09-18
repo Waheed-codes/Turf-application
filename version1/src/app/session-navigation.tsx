@@ -85,50 +85,23 @@ export function SessionNavigation({ children }: { children: ReactNode }) {
     const isUserProtected = USER_PROTECTED_PAGES.some((prefix) =>
       pathname.startsWith(prefix),
     );
-    const isManagerPage = pathname.startsWith("/manager");
-    const isAdminPage = pathname.startsWith("/admin");
-    const requiresAuth = isUserProtected || isManagerPage || isAdminPage;
 
-    // If unauthenticated and accessing protected pages
-    if (!user && requiresAuth) {
+    // If unauthenticated and accessing protected user pages
+    if (!user && isUserProtected) {
       router.replace("/login");
       return;
     }
 
-    // If authenticated and visiting auth pages (login/signup/otp), redirect by role
+    // If authenticated and visiting auth pages (login/signup/otp), redirect to home
     if (user && isAuthPage) {
-      if (user.role === "admin") {
-        router.replace("/admin");
-      } else if (user.role === "manager") {
-        router.replace("/manager");
-      } else {
-        router.replace("/home");
-      }
+      router.replace("/home");
       return;
-    }
-
-    // Role-based route enforcement
-    if (user) {
-      if (isAdminPage && user.role !== "admin") {
-        router.replace(user.role === "manager" ? "/manager" : "/home");
-        return;
-      }
-      if (isManagerPage && user.role !== "manager" && user.role !== "admin") {
-        router.replace("/home");
-        return;
-      }
     }
   }, [user, loading, pathname, router]);
 
   async function completeLogin() {
-    const loggedInUser = await refreshSession();
-    if (loggedInUser?.role === "admin") {
-      router.replace("/admin");
-    } else if (loggedInUser?.role === "manager") {
-      router.replace("/manager");
-    } else {
-      router.replace("/home");
-    }
+    await refreshSession();
+    router.replace("/home");
   }
 
   function completePreviewLogin() {
@@ -152,12 +125,9 @@ export function SessionNavigation({ children }: { children: ReactNode }) {
   const isUserProtected = USER_PROTECTED_PAGES.some((prefix) =>
     pathname.startsWith(prefix),
   );
-  const isManagerPage = pathname.startsWith("/manager");
-  const isAdminPage = pathname.startsWith("/admin");
-  const requiresAuth = isUserProtected || isManagerPage || isAdminPage;
 
   // Avoid flash of content while checking initial session on protected or auth routes
-  if (loading && (isAuthPage || requiresAuth)) {
+  if (loading && (isAuthPage || isUserProtected)) {
     return (
       <div className="flex min-h-svh items-center justify-center bg-white font-sans text-sm text-neutral-500">
         Loading...
