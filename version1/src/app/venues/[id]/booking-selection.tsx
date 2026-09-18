@@ -50,7 +50,7 @@ export default function BookingSelection({ venue, initialDate, context, onChange
       {areas.map((area) => <button key={area.id} type="button" aria-pressed={areaId === area.id} onClick={() => { if (areaId !== area.id) { setAreaId(area.id); onChange(null); } }} className={`min-h-11 shrink-0 rounded-full border px-4 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 ${areaId === area.id ? "border-black bg-black text-white" : "border-neutral-200 bg-white"}`}>{area.name}</button>)}
     </div></fieldset>}
     <fieldset className="mt-7 min-w-0"><legend className="text-base font-semibold">Select a slot</legend><p className="mt-1 text-xs text-neutral-500">{sport ? "Swipe for more times. Grey slots are unavailable in this demo." : "Choose a sport first."}</p>
-      <div ref={slotList} aria-label="Available time slots" tabIndex={0} className="relative mt-4 grid w-full min-w-0 max-w-full grid-flow-col grid-rows-2 auto-cols-[44%] gap-2 overflow-x-auto p-1 pb-3 focus-visible:outline-2">
+      <div ref={slotList} aria-label="Available time slots" tabIndex={0} className="relative mt-4 grid w-full min-w-0 max-w-full grid-flow-col grid-rows-2 auto-cols-[44%] gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden p-1 pb-3 focus-visible:outline-2">
         {visibleSlots.map((slot) => {
           const candidate: BookingContext = { source: "discovery", sport: sport as VenueSport, date, areaId, start: slot.start, end: slot.end };
           const available = slot.available;
