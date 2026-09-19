@@ -50,7 +50,7 @@ export type AdminManager = {
 export const NEW_MANAGER_STATUS: AdminManagerStatus = "PENDING";
 export const MANAGERS_PER_PAGE = 10;
 // Demonstration only: no message is sent and this does not verify an identity.
-export const DEVELOPMENT_MANAGER_OTP = "123456";
+export const DEVELOPMENT_MANAGER_OTP = "1234";
 
 const managerNames = [
   "Rahul Sharma", "Meera Joshi", "David Wilson", "Kevin Peterson", "Sarah Chen",

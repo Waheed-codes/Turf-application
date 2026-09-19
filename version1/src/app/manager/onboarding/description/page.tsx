@@ -1,7 +1,7 @@
 "use client";
 
 import { useSetupEdit } from "@/components/manager/use-setup-edit";
-import { useManagerOnboarding } from "@/components/manager/manager-onboarding-provider";
+import { formatVenueDimensions, useManagerOnboarding } from "@/components/manager/manager-onboarding-provider";
 import { useRouter } from "next/navigation";
 
 const MIN_DESCRIPTION_LENGTH = 20;
@@ -10,8 +10,10 @@ const MAX_DESCRIPTION_LENGTH = 500;
 export default function Page() {
   const router = useRouter();
   const { settingsEdit, destination } = useSetupEdit();
-  const { description, setDescription } = useManagerOnboarding();
-  const canContinue = description.trim().length >= MIN_DESCRIPTION_LENGTH;
+  const { description, setDescription, dimensions, setDimensions } = useManagerOnboarding();
+  const positive = (value: number | null) => value != null && Number.isFinite(value) && value > 0;
+  const validDimensions = positive(dimensions.length) && positive(dimensions.width) && (dimensions.height == null || positive(dimensions.height));
+  const canContinue = description.trim().length >= MIN_DESCRIPTION_LENGTH && validDimensions;
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white font-sans text-neutral-900">
@@ -28,6 +30,45 @@ export default function Page() {
         <h1 className="text-[26px] leading-8 font-bold tracking-tight">Tell your story</h1>
         <p id="description-intro" className="mt-2 max-w-sm text-sm leading-[21px] text-neutral-500">Provide details about your facilities, dimensions, and unique features to attract more players.</p>
 
+        <fieldset className="mt-8 min-w-0">
+          <legend className="text-sm font-semibold text-neutral-700">Dimensions</legend>
+          <div className="mt-3 flex flex-wrap items-end gap-3">
+            {(["length", "width", "height"] as const).map((dimension, index) => (
+              <div key={dimension} className="flex min-w-0 flex-1 basis-[120px] items-end gap-3">
+                {index > 0 && <span aria-hidden="true" className="flex min-h-14 items-center text-neutral-500">×</span>}
+                <div className="min-w-0 flex-1">
+                  <label htmlFor={`venue-${dimension}`} className="block text-xs font-medium text-neutral-500">{dimension === "length" ? "Length" : dimension === "width" ? "Width" : "Height"}</label>
+                  <div className="relative mt-2">
+                    <input
+                      id={`venue-${dimension}`}
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      step="any"
+                      required={dimension !== "height"}
+                      value={dimensions[dimension] ?? ""}
+                      placeholder={dimension === "length" ? "120" : dimension === "width" ? "70" : "20"}
+                      aria-describedby="dimensions-unit"
+                      onWheel={(event) => event.currentTarget.blur()}
+                      onKeyDown={(event) => { if (event.key === "-") event.preventDefault(); }}
+                      onChange={(event) => {
+                        const value = event.target.valueAsNumber;
+                        if (event.target.value === "") setDimensions((current) => ({ ...current, [dimension]: null }));
+                        else if (Number.isFinite(value) && value > 0) setDimensions((current) => ({ ...current, [dimension]: value }));
+                        else event.target.value = dimensions[dimension] == null ? "" : String(dimensions[dimension]);
+                      }}
+                      className="min-h-14 w-full min-w-0 rounded-2xl border border-neutral-200 bg-neutral-50 py-3 pr-10 pl-4 text-base text-neutral-900 placeholder:text-neutral-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 [-moz-appearance:textfield] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0"
+                    />
+                    <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-sm text-neutral-500">ft</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p id="dimensions-unit" className="mt-2 text-xs leading-5 text-neutral-500">Length and width are required. Height is optional. Enter positive values in feet.</p>
+          {validDimensions && <p className="mt-2 text-xs text-neutral-500">{formatVenueDimensions(dimensions)}</p>}
+        </fieldset>
+
         <label htmlFor="venue-description" className="mt-8 block text-sm font-semibold text-neutral-700">About the Venue</label>
         <div className="relative mt-2">
           <textarea
@@ -36,7 +77,7 @@ export default function Page() {
             value={description}
             onChange={(event) => setDescription(event.target.value.slice(0, MAX_DESCRIPTION_LENGTH))}
             maxLength={MAX_DESCRIPTION_LENGTH}
-            placeholder="Describe your turf (dimensions, surface type, capacity, etc.)"
+            placeholder="Describe your turf (surface type, capacity, etc.)"
             aria-describedby="description-intro description-requirement description-counter"
             className="block h-[300px] w-full min-w-0 resize-none rounded-3xl border border-neutral-200 bg-neutral-50 p-5 pb-12 text-base leading-7 text-neutral-900 placeholder:text-neutral-400 focus-visible:border-neutral-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
           />

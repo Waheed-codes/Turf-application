@@ -26,7 +26,6 @@ export default function VenuesPage() {
   // Tabs and the Status select are two controls for the same filter.
   const [status, setStatus] = useState<"" | AdminVenueStatus>("");
   const [page, setPage] = useState(1);
-  const [notice, setNotice] = useState("");
   const sports = Array.from(new Map(venues.flatMap((venue) => venue.selectedSports.map((item) => [item.id, item.label] as const))).entries()).sort((a, b) => a[1].localeCompare(b[1]));
   const areas = Array.from(new Set(venues.map((venue) => venue.location.area))).sort();
   const filtered = venues.filter((venue) => venue.name.toLowerCase().includes(query.trim().toLowerCase()) && (!status || venue.status === status) && (!area || venue.location.area === area) && (!sport || venue.selectedSports.some((item) => item.id === sport)));
@@ -44,8 +43,7 @@ export default function VenuesPage() {
   ];
 
   return <>
-    <AdminPageHeader title="Venues" subtitle="Review and manage all listed venues"><button type="button" onClick={() => setNotice("Venue creation is coming soon. Managers configure their venues during onboarding.")} className="flex min-h-10 items-center gap-2 rounded-lg bg-neutral-900 px-4 text-sm font-semibold text-white shadow-sm hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-2"><AdminIcon name="plus" />Add Venue</button></AdminPageHeader>
-    {notice && <div role="status" className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm text-neutral-600"><p>{notice}</p><button type="button" aria-label="Dismiss message" onClick={() => setNotice("")} className="flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-neutral-100 focus-visible:outline-2"><AdminIcon name="close" /></button></div>}
+    <AdminPageHeader title="Venues" subtitle="Review and manage all listed venues" />
     <dl aria-label="Venue summary" className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">{stats.map((stat) => <AdminStatCard key={stat.label} {...stat} value={String(stat.value)} compact />)}</dl>
     <div role="group" aria-label="Venue status tabs" className="mt-5 flex flex-wrap gap-6 border-b border-neutral-200">{tabs.map((tab) => <button key={tab.label} type="button" aria-pressed={status === tab.value} onClick={() => changeStatus(tab.value)} className={`min-h-12 border-b-2 px-0.5 text-sm font-medium focus-visible:outline-2 focus-visible:-outline-offset-4 ${status === tab.value ? "border-neutral-900 text-neutral-900" : "border-transparent text-neutral-500 hover:text-neutral-900"}`}>{tab.label}</button>)}</div>
     <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-xs">
