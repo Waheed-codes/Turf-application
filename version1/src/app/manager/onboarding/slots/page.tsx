@@ -165,7 +165,7 @@ function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
           })}
         </div>
         <p className="mt-3 flex items-start gap-1.5 text-xs leading-[18px] text-neutral-500">
-          <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 size-3 shrink-0" fill="currentColor"><circle cx="12" cy="12" r="10" /><path d="M12 11v6m0-10v1" fill="none" stroke="white" strokeWidth="2" /></svg>
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 size-3 shrink-0" fill="currentColor"><circle cx="12" cy="12" r="10" /><path d="M12 11v6m0-10v1" fill="none" stroke="var(--color-white)" strokeWidth="2" /></svg>
           <span className="min-w-0 [overflow-wrap:anywhere]">Set hours for {selectedResource.sportLabel} • {selectedResource.name}. You can customize each playing area separately.</span>
         </p>
         <h1 className="mt-8 text-[26px] leading-8 font-bold tracking-tight">Operating Hours</h1>

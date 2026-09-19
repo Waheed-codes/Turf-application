@@ -1,5 +1,6 @@
 "use client";
 
+import TimeWheelPicker from "@/components/booking/time-wheel-picker";
 import DateSelector from "@/components/booking/date-selector";
 import CustomerNavigation from "@/components/navigation/customer-navigation";
 import { useState } from "react";
@@ -8,7 +9,6 @@ import {
   generateUpcomingDates,
   mockLocation,
   sports,
-  timeOptions,
   upcomingGame,
   type UpcomingGame,
 } from "@/data/mockHome";
@@ -150,47 +150,14 @@ export default function HomeScreen({ initialContext, initialQuery = "" }: { init
                       TO
                     </span>
                   )}
-                  <label className="relative min-w-0 flex-1">
-                    <span className="sr-only">
-                      {kind === "start" ? "Start time" : "End time"}
-                    </span>
-                    <select
-                      aria-label={kind === "start" ? "Start time" : "End time"}
-                      value={kind === "start" ? startTime : endTime}
-                      onChange={(event) => {
-                        setSubmitted(null);
-                        const newValue = event.target.value;
-                        if (kind === "start") {
-                          setStartTime(newValue);
-                          if (newValue >= endTime) {
-                            setEndTime("");
-                          }
-                        } else {
-                          setEndTime(newValue);
-                        }
-                        setNotice("");
-                      }}
-                      className={`min-h-12 w-full appearance-none rounded-full border ${(kind === "start" ? startTime : endTime) ? "border-neutral-950" : "border-neutral-300"} bg-white py-2.5 px-4 text-left text-sm font-semibold focus:border-neutral-950 focus:outline-none focus:ring-1 focus:ring-neutral-950 transition-colors`}
-                    >
-                      <option value="" disabled hidden>
-                        0:00
-                      </option>
-                      {(kind === "end" && startTime
-                        ? timeOptions.filter((opt) => opt.value > startTime)
-                        : kind === "start"
-                          ? timeOptions.slice(0, -1)
-                          : timeOptions
-                      ).map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <HomeIcon
-                      name="chevron"
-                      className="pointer-events-none absolute top-1/2 right-3 size-3 -translate-y-1/2 rotate-90 text-neutral-400"
-                    />
-                  </label>
+                  <TimeWheelPicker kind={kind} date={date} value={kind === "start" ? startTime : endTime} after={kind === "end" ? startTime : undefined} onChange={(newValue) => {
+                    setSubmitted(null);
+                    if (kind === "start") {
+                      setStartTime(newValue);
+                      if (newValue >= endTime) setEndTime("");
+                    } else setEndTime(newValue);
+                    setNotice("");
+                  }} />
                 </div>
               ))}
             </div>

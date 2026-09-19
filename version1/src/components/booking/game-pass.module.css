@@ -1,0 +1,15 @@
+.machine { animation: acknowledge 700ms ease-out; transition: opacity 400ms; }
+.quiet { opacity: .55; }
+.paper { animation: print 2200ms cubic-bezier(.2,.6,.25,1) 650ms both; }
+.connection { transform-origin: top; }
+.broken { animation: breakConnection 180ms ease-out forwards; }
+.tearing { animation: release 420ms cubic-bezier(.2,.7,.2,1) both; }
+.tornEdge { clip-path: polygon(0 0, 5% 50%, 10% 0, 15% 50%, 20% 0, 25% 50%, 30% 0, 35% 50%, 40% 0, 45% 50%, 50% 0, 55% 50%, 60% 0, 65% 50%, 70% 0, 75% 50%, 80% 0, 85% 50%, 90% 0, 95% 50%, 100% 0, 100% 100%, 0 100%); height: 6px; top: -5px; background: var(--color-white); border: 0; }
+@keyframes acknowledge { 35% { transform: translateY(2px); } 65% { transform: translateY(-1px); } }
+@keyframes print { from { transform: translateY(-102%); } to { transform: translateY(0); } }
+@keyframes breakConnection { from { opacity: 1; transform: scaleY(1); } to { opacity: 0; transform: scaleY(.2); } }
+@keyframes release { 0% { transform: translateY(var(--tear-from)) rotate(0); } 35% { transform: translateY(calc(var(--tear-from) + 14px)) rotate(.7deg); } 75% { transform: translateY(36px) rotate(-.3deg); } 100% { transform: translateY(40px) rotate(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .machine, .paper, .tearing, .broken { animation-duration: 1ms; animation-delay: 0ms; transition: none; }
+  .ticket { transition: none !important; }
+}

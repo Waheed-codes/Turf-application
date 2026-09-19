@@ -8,10 +8,10 @@ import HomeIcon from "@/app/home/home-icon";
 import type { Venue, VenueSport } from "@/types/venue";
 import { playingAreas, selectedArea, bookingQuery, dateLabel, mockPrice, timeLabel, venueSlots, resolvedSlots, type BookingContext } from "@/lib/booking-context";
 
-export function PriceDetails({ venue, context }: { venue: Venue; context: BookingContext }) {
+export function PriceDetails({ venue, context, showPreviewNote = true }: { venue: Venue; context: BookingContext; showPreviewNote?: boolean }) {
   const price = mockPrice(venue, context);
   if (!price.duration) return null;
-  return <section className="mt-7 border-t border-neutral-100 pt-6" aria-label="Price Details"><h2 className="text-base font-semibold">Price Details</h2><dl className="mt-4 space-y-3 text-sm">{[["Slot subtotal", price.slotPrice], ["Platform Fee", price.platformFee], ["Taxes", price.taxes], ["Total", price.total]].map(([label, amount]) => <div key={label} className={`flex justify-between gap-4 ${label === "Total" ? "border-t border-neutral-200 pt-3 font-semibold" : "text-neutral-500"}`}><dt>{label}</dt><dd className="font-semibold text-neutral-950">₹{Number(amount).toLocaleString("en-IN")}</dd></div>)}</dl><p className="mt-3 text-xs text-neutral-500">Preview pricing only; no slot is reserved.</p></section>;
+  return <section className="mt-7 border-t border-neutral-100 pt-6" aria-label="Price Details"><h2 className="text-base font-semibold">Price Details</h2><dl className="mt-4 space-y-3 text-sm">{[["Slot subtotal", price.slotPrice], ["Platform Fee", price.platformFee], ["Taxes", price.taxes], ["Total", price.total]].map(([label, amount]) => <div key={label} className={`flex justify-between gap-4 ${label === "Total" ? "border-t border-neutral-200 pt-3 font-semibold" : "text-neutral-500"}`}><dt>{label}</dt><dd className="font-semibold text-neutral-950">₹{Number(amount).toLocaleString("en-IN")}</dd></div>)}</dl>{showPreviewNote && <p className="mt-3 text-xs text-neutral-500">Preview pricing only; no slot is reserved.</p>}</section>;
 }
 
 export function SportDetails({ venue, sport }: { venue: Venue; sport: VenueSport }) {
@@ -19,10 +19,10 @@ export function SportDetails({ venue, sport }: { venue: Venue; sport: VenueSport
   if (!config) return null;
   return <section aria-label="Selected Sport Details" className="mt-4"><dl className="grid grid-cols-2 gap-3 text-sm">{[["Dimensions", config.dimensions], [config.countLabel, config.count], ["Surface", config.surface]].map(([label, value]) => <div key={label}><dt className="text-xs text-neutral-500">{label}</dt><dd className="mt-1 font-medium">{value}</dd></div>)}</dl></section>;
 }
-export function BookingSummary({ venue, context }: { venue: Venue; context: BookingContext }) {
+export function BookingSummary({ venue, context, title = "Your Selection" }: { venue: Venue; context: BookingContext; title?: string }) {
   const slots = resolvedSlots(venue, context);
   if (!slots.length) return null;
-  return <section aria-label="Selected booking" className="mt-7 rounded-xl border border-neutral-200 p-4 text-sm"><h2 className="font-semibold">Your Selection</h2><p className="mt-2">{context.sport}</p><p>{selectedArea(venue, context.sport, context.areaId)?.name}</p><p>{dateLabel(context.date)}</p><ul className="mt-3 space-y-2">{slots.map((slot) => <li key={slot.id} className="flex flex-wrap justify-between gap-2"><span>{timeLabel(slot.start)} – {timeLabel(slot.end)}</span><span className="font-semibold">₹{slot.price.toLocaleString("en-IN")}</span></li>)}</ul><p className="mt-3 text-xs text-neutral-500">{`${slots.length} ${slots.length === 1 ? "slot" : "slots"} selected`}</p></section>;
+  return <section aria-label="Selected booking" className="mt-7 rounded-xl border border-neutral-200 p-4 text-sm"><h2 className="font-semibold">{title}</h2><p className="mt-2">{context.sport}</p><p>{selectedArea(venue, context.sport, context.areaId)?.name}</p><p>{dateLabel(context.date)}</p><ul className="mt-3 space-y-2">{slots.map((slot) => <li key={slot.id} className="flex flex-wrap justify-between gap-2"><span>{timeLabel(slot.start)} – {timeLabel(slot.end)}</span><span className="font-semibold">₹{slot.price.toLocaleString("en-IN")}</span></li>)}</ul><p className="mt-3 text-xs text-neutral-500">{`${slots.length} ${slots.length === 1 ? "slot" : "slots"} selected`}</p></section>;
 }
 
 export default function BookingSelection({ venue, initialDate, context, onChange, requested, initialSport }: { venue: Venue; initialDate: string; context: BookingContext | null; onChange: (context: BookingContext | null) => void; requested?: BookingContext; initialSport?: VenueSport }) {

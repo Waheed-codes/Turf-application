@@ -15,10 +15,10 @@ export const bookingTrends: Record<AdminRange, TrendPoint[]> = {
   90: Array.from({ length: 90 }, (_, index) => ({ day: index + 1, count: index >= 60 ? monthlyCounts[index - 60] : Math.round(monthlyCounts[index % 30] * (index < 30 ? 0.65 : 0.82)) })),
 };
 export const sportBookings = [
-  { name: "Cricket", percentage: 38, shade: "#171717" },
-  { name: "Football", percentage: 27, shade: "#525252" },
-  { name: "Tennis", percentage: 20, shade: "#a3a3a3" },
-  { name: "Padel", percentage: 15, shade: "#d4d4d4" },
+  { name: "Cricket", percentage: 38, shade: "var(--color-black)" },
+  { name: "Football", percentage: 27, shade: "var(--color-neutral-600)" },
+  { name: "Tennis", percentage: 20, shade: "var(--color-neutral-400)" },
+  { name: "Padel", percentage: 15, shade: "var(--color-neutral-300)" },
 ];
 export const recentActivity = [
   { id: "manager-1", title: "New manager signup", venue: "Rahul's Turf", detail: "Just now · Verified", status: "Success", icon: "managers" },
