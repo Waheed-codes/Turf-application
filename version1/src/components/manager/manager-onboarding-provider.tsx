@@ -19,9 +19,10 @@ export const durations = [
   { minutes: 60, label: "1 Hour" },
   { minutes: 90, label: "1.5 Hours" },
   { minutes: 120, label: "2 Hours" },
+  { minutes: 180, label: "3 Hours" },
 ];
 type BaseSlot = { id: string; startMinutes: number; endMinutes: number; enabled: boolean };
-export type Configuration = { openingMinutes: number; closingMinutes: number; durationMinutes: number };
+export type Configuration = { openingMinutes: number; closingMinutes: number; durationMinutes: number; slotPrice?: number | null };
 export type Schedule = Configuration & { slots: BaseSlot[] };
 
 function generateSlots(config: Configuration, previous: BaseSlot[] = []): BaseSlot[] {
@@ -53,6 +54,13 @@ export const terminology: Record<ResourceType, { name: string; label: string }> 
   pitch: { name: "Pitch", label: "PITCH/TURF" }, court: { name: "Court", label: "COURT" },
   pool: { name: "Pool", label: "POOL" }, area: { name: "Area", label: "AREA" },
 };
+
+export type VenueDimensions = { length: number | null; width: number | null; height: number | null; unit: "ft" };
+
+export function formatVenueDimensions({ length, width, height, unit }: VenueDimensions): string {
+  if (length == null || width == null) return "";
+  return [length, width, height].filter((value) => value != null).map((value) => `${value} ${unit}`).join(" × ");
+}
 
 export type VenuePhoto = { id: string; name: string; previewUrl: string };
 type Amenity = { id: string; label: string; icon: ReactNode };
@@ -89,6 +97,8 @@ type OnboardingContext = OnboardingState & {
   setSelectedArea: (update: SetStateAction<string>) => void;
   mockDetected: boolean;
   setMockDetected: (update: SetStateAction<boolean>) => void;
+  dimensions: VenueDimensions;
+  setDimensions: (update: SetStateAction<VenueDimensions>) => void;
   description: string;
   setDescription: (update: SetStateAction<string>) => void;
   photos: VenuePhoto[];
@@ -113,7 +123,7 @@ type OnboardingContext = OnboardingState & {
 const ManagerOnboardingContext = createContext<OnboardingContext | null>(null);
 
 function defaultSchedule(): Schedule {
-  const config = { openingMinutes: 360, closingMinutes: DAY_MINUTES, durationMinutes: 60 };
+  const config = { openingMinutes: 360, closingMinutes: DAY_MINUTES, durationMinutes: 60, slotPrice: null };
   return { ...config, slots: generateSlots(config) };
 }
 
@@ -144,6 +154,7 @@ export function ManagerOnboardingProvider({ children }: { children: ReactNode })
   const [mapsUrl, setMapsUrl] = useState<string>("");
   const [selectedArea, setSelectedArea] = useState<string>("");
   const [mockDetected, setMockDetected] = useState<boolean>(false);
+  const [dimensions, setDimensions] = useState<VenueDimensions>({ length: null, width: null, height: null, unit: "ft" });
   const [description, setDescription] = useState<string>("");
   const [photos, setPhotos] = useState<VenuePhoto[]>([]);
   const [selectedAmenityIds, setSelectedAmenityIds] = useState<string[]>(["washroom", "water", "floodlights"]);
@@ -205,7 +216,7 @@ export function ManagerOnboardingProvider({ children }: { children: ReactNode })
     setState((current) => {
       const existing = current.schedulesByResource[resourceId];
       if (!existing) return current;
-      const config = { openingMinutes: existing.openingMinutes, closingMinutes: existing.closingMinutes, durationMinutes: existing.durationMinutes, ...update };
+      const config = { openingMinutes: existing.openingMinutes, closingMinutes: existing.closingMinutes, durationMinutes: existing.durationMinutes, slotPrice: existing.slotPrice, ...update };
       return { ...current, schedulesByResource: { ...current.schedulesByResource, [resourceId]: { ...config, slots: generateSlots(config, existing.slots) } } };
     });
   }
@@ -220,7 +231,7 @@ export function ManagerOnboardingProvider({ children }: { children: ReactNode })
     });
   }
 
-  return <ManagerOnboardingContext.Provider value={{ ...state, mapsUrl, setMapsUrl, selectedArea, setSelectedArea, mockDetected, setMockDetected, description, setDescription, photos, setPhotos, selectedAmenityIds, setSelectedAmenityIds, customAmenities, setCustomAmenities, notificationPreferences, setNotificationPreferences, dashboardSelection, setDashboardSelection, mockBookings: mockState.bookings.map((booking) => { const area = state.playingAreas.find((area) => area.id === booking.resourceId); return area ? { ...booking, playingAreaName: area.name, sportName: area.sportLabel } : booking; }), markSlotBooked, seedMockBookings, toggleSport, addCustomSport, setPlayingAreas, updateConfiguration, toggleSlot }}>{children}</ManagerOnboardingContext.Provider>;
+  return <ManagerOnboardingContext.Provider value={{ ...state, mapsUrl, setMapsUrl, selectedArea, setSelectedArea, mockDetected, setMockDetected, dimensions, setDimensions, description, setDescription, photos, setPhotos, selectedAmenityIds, setSelectedAmenityIds, customAmenities, setCustomAmenities, notificationPreferences, setNotificationPreferences, dashboardSelection, setDashboardSelection, mockBookings: mockState.bookings.map((booking) => { const area = state.playingAreas.find((area) => area.id === booking.resourceId); return area ? { ...booking, playingAreaName: area.name, sportName: area.sportLabel } : booking; }), markSlotBooked, seedMockBookings, toggleSport, addCustomSport, setPlayingAreas, updateConfiguration, toggleSlot }}>{children}</ManagerOnboardingContext.Provider>;
 }
 
 export function useManagerOnboarding() {

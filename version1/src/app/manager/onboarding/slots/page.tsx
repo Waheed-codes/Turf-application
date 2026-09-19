@@ -104,6 +104,7 @@ function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
   const initialResource = resources.find((resource) => resource.id === searchParams.get("resourceId")) ?? resources[0];
   const { schedulesByResource, updateConfiguration, toggleSlot, setDashboardSelection } = useManagerOnboarding();
   const [requestedResourceId, setSelectedResourceId] = useState(initialResource.id);
+  const [validationResourceId, setValidationResourceId] = useState<string | null>(null);
   const selectedChipRef = useRef<HTMLButtonElement>(null);
   const selectedIndex = Math.max(0, resources.findIndex((resource) => resource.id === requestedResourceId));
   const selectedResource = resources[selectedIndex];
@@ -112,13 +113,25 @@ function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
   const availableCount = schedule.slots.filter((slot) => slot.enabled).length;
   const overnight = schedule.closingMinutes === DAY_MINUTES || schedule.closingMinutes < schedule.openingMinutes;
   const isFinalResource = selectedIndex === resources.length - 1;
+  const validDuration = durations.some((duration) => duration.minutes === schedule.durationMinutes);
+  const validPrice = schedule.slotPrice != null && Number.isSafeInteger(schedule.slotPrice) && schedule.slotPrice > 0;
+  const priceLabel = validDuration
+    ? `PRICE PER ${schedule.durationMinutes === 30 ? "30-MINUTE" : `${schedule.durationMinutes / 60}-HOUR`} SLOT`
+    : "PRICE PER SLOT";
+  const validationMessage = !validDuration ? "Choose a slot duration to continue."
+    : schedule.slots.length === 0 ? "Choose valid opening and closing times that allow at least one complete slot."
+    : !validPrice ? "Enter a whole-rupee slot price greater than ₹0 to continue."
+    : availableCount === 0 ? "Enable at least one slot to continue." : "";
+  const showValidation = validationResourceId === selectedResourceId;
 
   useEffect(() => {
     selectedChipRef.current?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [selectedResourceId]);
 
   function saveAndContinue() {
-    if (availableCount === 0) return;
+    setValidationResourceId(selectedResourceId);
+    if (validationMessage) return;
+    setValidationResourceId(null);
     if (editMode) {
       setDashboardSelection((current) => ({ ...current, sportId: selectedResource.sportId, resourceId: selectedResourceId }));
       router.push(destination("/manager/dashboard"));
@@ -178,6 +191,32 @@ function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
           <svg aria-hidden="true" viewBox="0 0 24 24" className="pointer-events-none absolute top-5 right-4 size-4 text-neutral-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
         </div>
 
+        <label htmlFor="slot-price" className="mt-6 block text-xs font-semibold tracking-wide text-neutral-500">{priceLabel}</label>
+        <div className="relative mt-2">
+          <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-sm font-medium text-neutral-500">₹</span>
+          <input
+            key={selectedResourceId}
+            id="slot-price"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="Enter price"
+            required
+            value={validPrice ? (schedule.slotPrice ?? "") : ""}
+            aria-invalid={showValidation && !validPrice}
+            aria-describedby={`slot-price-note${showValidation && validationMessage ? " slot-validation" : ""}`}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (!/^[0-9]*$/.test(value)) return;
+              const slotPrice = Number(value);
+              if (value === "") updateConfiguration(selectedResourceId, { slotPrice: null });
+              else if (Number.isSafeInteger(slotPrice) && slotPrice > 0) updateConfiguration(selectedResourceId, { slotPrice });
+            }}
+            className="min-h-14 w-full min-w-0 rounded-2xl border border-neutral-200 bg-neutral-50 py-3 pr-4 pl-10 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+          />
+        </div>
+        <p id="slot-price-note" className="mt-2 text-xs leading-[18px] text-neutral-500">This price applies to {selectedResource.sportLabel} • {selectedResource.name}.</p>
+
         <section aria-labelledby="generated-slots-title" className="mt-8">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 id="generated-slots-title" className="text-sm font-semibold">GENERATED SLOTS</h2>
@@ -207,7 +246,8 @@ function ScheduleEditor({ resources }: { resources: PlayingArea[] }) {
       </main>
 
       <footer className="sticky bottom-0 border-t border-neutral-100 bg-white px-6 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-        <button type="button" disabled={availableCount === 0} onClick={saveAndContinue} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500 disabled:shadow-none motion-safe:transition-colors">
+        {showValidation && validationMessage && <p id="slot-validation" role="alert" className="mb-3 text-xs leading-[18px] text-neutral-600">{validationMessage}</p>}
+        <button type="button" onClick={saveAndContinue} className="flex min-h-[60px] w-full items-center justify-center rounded-2xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white shadow-sm hover:bg-neutral-800 active:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 motion-safe:transition-colors">
           {editMode ? "Save Changes" : isFinalResource ? "Save & Continue" : "Save & Next Court"}
         </button>
       </footer>

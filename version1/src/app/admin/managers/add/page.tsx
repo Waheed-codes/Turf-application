@@ -10,7 +10,8 @@ import { DEVELOPMENT_MANAGER_OTP } from "@/data/admin/mockAdmin";
 const inputClass = "min-h-11 w-full min-w-0 rounded-lg border border-neutral-300 bg-neutral-50 px-3 text-sm placeholder:text-neutral-400 focus-visible:outline-2 focus-visible:outline-neutral-800";
 const buttonClass = "min-h-11 rounded-lg border border-neutral-300 bg-white px-3 text-sm font-medium hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40";
 const primaryClass = "min-h-12 w-full rounded-xl bg-neutral-900 px-4 py-3 text-base font-semibold text-white shadow-sm hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-500 disabled:shadow-none";
-const emptyOtp = () => Array<string>(6).fill("");
+const OTP_LENGTH = 4;
+const emptyOtp = () => Array<string>(OTP_LENGTH).fill("");
 
 function createTemporaryPassword() {
   const groups = ["ABCDEFGHJKLMNPQRSTUVWXYZ", "abcdefghijkmnopqrstuvwxyz", "23456789", "!@#$%&*_-+"];
@@ -71,12 +72,12 @@ export default function AddManagerPage() {
   function fillOtp(value: string, index: number) {
     const digits = value.replace(/\D/g, "");
     if (!digits && value) return;
-    const start = digits.length === 6 ? 0 : index;
+    const start = digits.length >= OTP_LENGTH ? 0 : index;
     const next = [...otp];
     if (!digits) next[index] = "";
-    else digits.slice(0, 6 - start).split("").forEach((digit, offset) => { next[start + offset] = digit; });
+    else digits.slice(0, OTP_LENGTH - start).split("").forEach((digit, offset) => { next[start + offset] = digit; });
     setOtp(next); setOtpError("");
-    if (digits) otpInputs.current[Math.min(start + digits.length, 5)]?.focus();
+    if (digits) otpInputs.current[Math.min(start + digits.length, OTP_LENGTH - 1)]?.focus();
   }
 
   function pasteOtp(event: ClipboardEvent<HTMLInputElement>, index: number) {
@@ -92,14 +93,14 @@ export default function AddManagerPage() {
       setOtpError(""); otpInputs.current[target]?.focus();
     } else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
       event.preventDefault();
-      otpInputs.current[Math.max(0, Math.min(5, index + (event.key === "ArrowLeft" ? -1 : 1)))]?.focus();
+      otpInputs.current[Math.max(0, Math.min(OTP_LENGTH - 1, index + (event.key === "ArrowLeft" ? -1 : 1)))]?.focus();
     }
   }
 
   function verifyOtp() {
     if (sentPhone !== phone || phoneError) return;
     if (otp.join("") !== DEVELOPMENT_MANAGER_OTP) {
-      setOtpError("Incorrect demo OTP. Enter the six-digit code shown above.");
+      setOtpError("Incorrect demo OTP. Enter the four-digit code shown above.");
       otpInputs.current[0]?.focus(); return;
     }
     setVerifiedPhone(phone); setOtpError("");
@@ -144,7 +145,7 @@ export default function AddManagerPage() {
         {venueTouched && !venueName.trim() && <p id="manager-venue-error" role="alert" className="mt-2 text-xs text-neutral-600">Enter the venue name.</p>}
         <fieldset className="mt-6 min-w-0" aria-describedby={otpError ? "manager-otp-error" : "manager-otp-hint"}><legend className="text-sm font-medium text-neutral-700">Verify OTP</legend>
           <p id="manager-otp-hint" role="status" className="mt-2 text-xs leading-5 text-neutral-500">{sentPhone ? <>Demo OTP: <strong className="font-semibold text-neutral-800">{DEVELOPMENT_MANAGER_OTP}</strong>. No SMS was sent.</> : "Send a demo OTP to enable verification."}</p>
-          <div className="mt-3 grid grid-cols-6 gap-2">{otp.map((digit, index) => <input key={index} ref={(element) => { otpInputs.current[index] = element; }} aria-label={`OTP digit ${index + 1}`} type="text" inputMode="numeric" pattern="[0-9]*" autoComplete={index === 0 ? "one-time-code" : "off"} value={digit} disabled={!sentPhone || verified} onChange={(event) => fillOtp(event.target.value, index)} onFocus={(event) => event.target.select()} onPaste={(event) => pasteOtp(event, index)} onKeyDown={(event) => otpKey(event, index)} aria-invalid={Boolean(otpError)} className="h-12 min-w-0 w-full rounded-lg border border-neutral-300 bg-neutral-50 text-center text-lg font-semibold focus-visible:outline-2 focus-visible:outline-neutral-800 disabled:text-neutral-500" />)}</div>
+          <div className="mt-3 grid grid-cols-4 gap-2">{otp.map((digit, index) => <input key={index} ref={(element) => { otpInputs.current[index] = element; }} aria-label={`OTP digit ${index + 1}`} type="text" inputMode="numeric" pattern="[0-9]*" maxLength={OTP_LENGTH} autoComplete={index === 0 ? "one-time-code" : "off"} value={digit} disabled={!sentPhone || verified} onChange={(event) => fillOtp(event.target.value, index)} onFocus={(event) => event.target.select()} onPaste={(event) => pasteOtp(event, index)} onKeyDown={(event) => otpKey(event, index)} aria-invalid={Boolean(otpError)} className="h-12 min-w-0 w-full rounded-lg border border-neutral-300 bg-neutral-50 text-center text-lg font-semibold focus-visible:outline-2 focus-visible:outline-neutral-800 disabled:text-neutral-500" />)}</div>
           {otpError && <p id="manager-otp-error" role="alert" className="mt-2 text-xs leading-5 text-neutral-600">{otpError}</p>}
           <button type="button" onClick={verifyOtp} disabled={otp.some((digit) => !digit) || !sentPhone || verified} className={`${primaryClass} mt-4`}>{verified ? "OTP Verified" : "Verify OTP"}</button>
         </fieldset>

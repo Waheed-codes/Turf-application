@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
@@ -28,6 +27,5 @@ export default function AdminDashboardPage() {
       <section aria-labelledby="top-venues-title" className={`${card} self-stretch p-5`}><div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 id="top-venues-title" className="text-base font-semibold">Top Performing Venues</h2><span className="text-xs text-neutral-400">By revenue</span></div><ol className="space-y-4">{topVenues.map((venue) => <li key={venue.name}><div className="mb-1.5 flex items-center justify-between gap-3 text-sm"><span className="text-neutral-600">{venue.name}</span><span className="shrink-0 font-semibold tabular-nums">{formatRupees(venue.revenue)}</span></div><div aria-hidden="true" className="h-1.5 overflow-hidden rounded-full bg-neutral-100"><div className="h-full rounded-full bg-neutral-400" style={{ width: `${venue.revenue / topVenues[0].revenue * 100}%` }} /></div></li>)}</ol></section>
     </div>
     <p className="mt-5 text-xs text-neutral-400">Preview data · Date range applies to the bookings trend.</p>
-    <Link href="/admin/managers" className="fixed right-5 bottom-6 z-10 flex min-h-[52px] items-center gap-2 rounded-full bg-neutral-900 px-6 text-sm font-semibold text-white shadow-lg hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-4 sm:right-8"><AdminIcon name="plus" className="size-5" />Add Manager</Link>
   </>;
 }

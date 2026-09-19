@@ -37,6 +37,7 @@ function Selector({ label, kind, children }: { label: string; kind: string; chil
 
 const selectClass = "min-h-8 w-full min-w-0 bg-white text-sm font-semibold text-neutral-900 focus-visible:outline-2 focus-visible:outline-neutral-900";
 const actionClass = "inline-flex min-h-12 items-center justify-center rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900";
+const priceFormatter = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
 export default function ManagerDashboardPage() {
   const { selectedSports, playingAreas, schedulesByResource, dashboardSelection, setDashboardSelection, mockBookings, seedMockBookings } = useManagerOnboarding();
@@ -47,6 +48,8 @@ export default function ManagerDashboardPage() {
   const today = localDate();
   const date = dashboardSelection.date >= today ? dashboardSelection.date : today;
   const schedule = resource ? schedulesByResource[resource.id] : undefined;
+  const slotPrice = schedule?.slotPrice;
+  const priceLabel = slotPrice != null && Number.isFinite(slotPrice) && slotPrice > 0 ? priceFormatter.format(slotPrice) : "Price not set";
   const resourceId = resource?.id;
   useEffect(() => {
     if (resourceId && schedule) seedMockBookings(resourceId, date, schedule.slots);
@@ -91,7 +94,11 @@ export default function ManagerDashboardPage() {
               const booked = isBooked(slot.startMinutes, slot.endMinutes);
               return <button key={slot.id} type="button" aria-haspopup="dialog" onClick={() => setActiveSlot({ resourceId: resource.id, sportLabel: sport.label, resourceName: resource.name, resourceLabel: terminology[resource.resourceType].name, date, dateLabel, startMinutes: slot.startMinutes, endMinutes: slot.endMinutes })} className="flex w-full cursor-pointer text-left hover:border-neutral-400 hover:bg-neutral-50 active:bg-neutral-100 active:shadow-inner focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 min-h-[74px] items-center gap-2 rounded-2xl border border-neutral-200 bg-white px-3 py-4 shadow-sm min-[375px]:gap-3 min-[375px]:px-4">
                 <span aria-hidden="true" className={`h-9 w-1 shrink-0 rounded-full ${booked ? "bg-neutral-900" : "bg-neutral-300"}`} />
-                <span className="min-w-0 flex-1"><span className="block text-[11px] font-semibold tabular-nums min-[375px]:text-[13px]">{formatTime(slot.startMinutes)} – {formatTime(slot.endMinutes)}</span>{slot.endMinutes >= DAY_MINUTES && <span className="mt-1 block text-[10px] text-neutral-500">{slot.startMinutes >= DAY_MINUTES ? "Next day" : "Ends next day"}</span>}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[11px] font-semibold tabular-nums min-[375px]:text-[13px]">{formatTime(slot.startMinutes)} – {formatTime(slot.endMinutes)}</span>
+                  <span className="mt-1 block text-[10px] tabular-nums text-neutral-500 min-[375px]:text-xs">{priceLabel}</span>
+                  {slot.endMinutes >= DAY_MINUTES && <span className="mt-1 block text-[10px] text-neutral-500">{slot.startMinutes >= DAY_MINUTES ? "Next day" : "Ends next day"}</span>}
+                </span>
                 <span className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-semibold tracking-wide min-[375px]:px-3 min-[375px]:text-[10px] ${booked ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-600"}`}>{booked ? "BOOKED" : "AVAILABLE"}</span>
               </button>;
             })}</div>

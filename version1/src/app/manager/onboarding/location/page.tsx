@@ -34,7 +34,7 @@ export default function Page() {
   const router = useRouter();
   const { settingsEdit, destination } = useSetupEdit();
   const { mapsUrl, setMapsUrl, selectedArea, setSelectedArea, mockDetected, setMockDetected } = useManagerOnboarding();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => areas.find((area) => area.id === selectedArea)?.name ?? "");
   const [mapExpanded, setMapExpanded] = useState(false);
   const filteredAreas = areas.filter((area) => area.name.toLowerCase().includes(search.trim().toLowerCase()));
   const canContinue = Boolean(mapsUrl.trim() || selectedArea || mockDetected);
@@ -42,7 +42,7 @@ export default function Page() {
   function detectMockLocation() {
     // Deliberately simulated: no browser geolocation or external requests.
     setSelectedArea("gachibowli");
-    setSearch("");
+    setSearch("Gachibowli");
     setMockDetected(true);
   }
 
@@ -106,7 +106,7 @@ export default function Page() {
           <div className="mt-2 overflow-hidden rounded-2xl border border-neutral-100 bg-white shadow-sm" aria-describedby="area-description">
             {filteredAreas.map((area) => (
               <label key={area.id} className={`relative flex min-h-[50px] cursor-pointer items-center gap-3 border-b border-neutral-100 px-4 py-3 text-sm last:border-b-0 hover:bg-neutral-50 ${selectedArea === area.id ? "bg-neutral-100 font-semibold text-neutral-900" : "text-neutral-700"}`}>
-                <input type="radio" name="preferred-area" value={area.id} checked={selectedArea === area.id} onChange={() => setSelectedArea(area.id)} className="peer sr-only" />
+                <input type="radio" name="preferred-area" value={area.id} checked={selectedArea === area.id} onChange={() => { setSelectedArea(area.id); setSearch(area.name); }} className="peer sr-only" />
                 <span className="pointer-events-none absolute inset-1 rounded-lg peer-focus-visible:outline-2 peer-focus-visible:outline-neutral-900" />
                 <span className={selectedArea === area.id ? "text-neutral-900" : "text-neutral-400"}><Pin /></span>
                 <span className="min-w-0 flex-1">{area.name}</span>
